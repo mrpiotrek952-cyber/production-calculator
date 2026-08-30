@@ -366,7 +366,7 @@
                     <input type="number" id="c-donut" value="0" step="0.5" onfocus="handleFocus(this)" oninput="calcChocolate()">
                 </div>
                 <div class="form-group">
-                    <label id="lbl-dozen">Dozen count</label>
+                    <label id="lbl-dozen">Ilość wyprodukowanych Pudelek</label>
                     <input type="number" id="c-dozen" value="0" onfocus="handleFocus(this)" oninput="calcChocolate()">
                 </div>
                 <div class="form-group">
@@ -514,47 +514,8 @@
                                     <th id="th-sum">Total Usage</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>855001</td>
-                                    <td>Seal PP 72x990 tarsp</td>
-                                    <td id="out-mat-855001">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>855158</td>
-                                    <td>Plastic Sheet</td>
-                                    <td id="out-mat-855158">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>855134</td>
-                                    <td>Plastic Sheet</td>
-                                    <td id="out-mat-855134">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>856936</td>
-                                    <td>Ribbon 55x600 T26</td>
-                                    <td id="out-mat-856936">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>855060</td>
-                                    <td>Film Ecostrech 17</td>
-                                    <td id="out-mat-855060">0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>855269</td>
-                                    <td>Eu-Brown</td>
-                                    <td id="out-mat-855269">0</td>
-                                </tr>
-                                <tr>
-                                    <td>856925</td>
-                                    <td>Palet Label</td>
-                                    <td id="out-mat-856925">0</td>
-                                </tr>
-                                <tr>
-                                    <td>855222</td>
-                                    <td>Box Label</td>
-                                    <td id="out-mat-855222">0</td>
-                                </tr>
+                            <tbody id="material-tbody">
+                                <!-- Dynamic rows based on selected product -->
                             </tbody>
                         </table>
                     </div>
@@ -570,7 +531,8 @@
                 <h2 id="process-header">📋 Proces Sheet</h2>
                 <p id="process-desc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Documentation and process specifications.</p>
                 <div class="form-group">
-                    <textarea rows="6" readonly style="resize: none;" id="process-text">1. Check line readiness and parameters.
+                    <textarea rows="6" readonly style="resize: none;" id="process-text">
+1. Check line readiness and parameters.
 2. Verify raw materials and packaging specs.
 3. Maintain standard speed parameters.
 4. Record waste and shift outputs regularly.</textarea>
@@ -671,7 +633,7 @@
             
             chocHeader: "🍫 Chocolate Calculation",
             lblChocDonut: "Chocolate per donut (g)",
-            lblDozen: "Dozen count",
+            lblDozen: "Ilość wyprodukowanych Pudelek",
             lblAantalPerDoos: "Pieces per box",
             lblAfval: "Packing waste (kg)",
             lblEindGewicht: "Final product weight (kg)",
@@ -771,7 +733,7 @@
             
             chocHeader: "🍫 Kalkulacja Czekolady",
             lblChocDonut: "Ilość czekolady w pączku (g)",
-            lblDozen: "Ilość tuzinów / paczek",
+            lblDozen: "Ilość wyprodukowanych Pudelek",
             lblAantalPerDoos: "Sztuk w pudełku",
             lblAfval: "Odpad na dziale pakowania (kg)",
             lblEindGewicht: "Waga produktu finalnego (kg)",
@@ -871,7 +833,7 @@
             
             chocHeader: "🍫 Schokoladenkalkulation",
             lblChocDonut: "Schokolade pro Donut (g)",
-            lblDozen: "Dutzend Anzahl",
+            lblDozen: "Ilość wyprodukowanych Pudelek",
             lblAantalPerDoos: "Stück pro Karton",
             lblAfval: "Verpackungsabfall (kg)",
             lblEindGewicht: "Endproduktgewicht (kg)",
@@ -971,7 +933,7 @@
             
             chocHeader: "🍫 Chocola Berekening",
             lblChocDonut: "Chocolade per donut (g)",
-            lblDozen: "Aantal dozen / eenheden",
+            lblDozen: "Ilość wyprodukowanych Pudelek",
             lblAantalPerDoos: "Stuks per doos",
             lblAfval: "Verpakkingsafval (kg)",
             lblEindGewicht: "Eindproductgewicht (kg)",
@@ -1306,10 +1268,34 @@
         const product = document.getElementById('m-product').value;
         const dynFields = document.getElementById('m-dynamic-fields');
         const tableContainer = document.getElementById('product-table-container');
+        const tbody = document.getElementById('material-tbody');
 
         if (product) {
             dynFields.style.display = 'block';
             tableContainer.style.display = 'block';
+
+            if (product === 'produkt-2u') {
+                tbody.innerHTML = `
+                    <tr><td>855001</td><td>Seal PP 72x990 tarsp</td><td id="out-mat-855001">0.00</td></tr>
+                    <tr><td>855158</td><td>Plastic Sheet</td><td id="out-mat-855158">0.00</td></tr>
+                    <tr><td>856936</td><td>Ribbon 55x600 T26</td><td id="out-mat-856936">0.00</td></tr>
+                    <tr><td>855060</td><td>Film Ecostrech 17</td><td id="out-mat-855060">0.00</td></tr>
+                    <tr><td>855269</td><td>Eu-Brown</td><td id="out-mat-855269">0</td></tr>
+                    <tr><td>856925</td><td>Palet Label</td><td id="out-mat-856925">0</td></tr>
+                    <tr><td>855222</td><td>Box Label</td><td id="out-mat-855222">0</td></tr>
+                `;
+            } else if (product === 'produkt-4u') {
+                tbody.innerHTML = `
+                    <tr><td>855001</td><td>Seal PP 72x990 tarsp</td><td id="out-mat-855001">0.00</td></tr>
+                    <tr><td>855134</td><td>Plastic Sheet</td><td id="out-mat-855134">0.00</td></tr>
+                    <tr><td>856936</td><td>Ribbon 55x600 T26</td><td id="out-mat-856936">0.00</td></tr>
+                    <tr><td>855060</td><td>Film Ecostrech 17</td><td id="out-mat-855060">0.00</td></tr>
+                    <tr><td>855269</td><td>Eu-Brown</td><td id="out-mat-855269">0</td></tr>
+                    <tr><td>856925</td><td>Palet Label</td><td id="out-mat-856925">0</td></tr>
+                    <tr><td>855222</td><td>Box Label</td><td id="out-mat-855222">0</td></tr>
+                `;
+            }
+
             calcMaterials();
         } else {
             dynFields.style.display = 'none';
@@ -1337,10 +1323,10 @@
             document.getElementById('out-mat-856925').innerText = Math.ceil(totalPallets * 2).toString();
             document.getElementById('out-mat-855222').innerText = boxes;
         } else if (product === 'produkt-4u') {
-            document.getElementById('out-mat-855001').innerText = (boxes * 1.40).toFixed(2);
-            document.getElementById('out-mat-855134').innerText = (totalPcs * 0.31).toFixed(2);
-            document.getElementById('out-mat-856936').innerText = (totalPcs * 0.0033).toFixed(2);
-            document.getElementById('out-mat-855060').innerText = (totalPallets * 0.5).toFixed(2);
+            document.getElementById('out-mat-855001').innerText = (boxes * 1.20).toFixed(2);
+            document.getElementById('out-mat-855134').innerText = (totalPcs * 0.40).toFixed(2);
+            document.getElementById('out-mat-856936').innerText = (totalPcs * 0.0040).toFixed(2);
+            document.getElementById('out-mat-855060').innerText = (totalPallets * 0.6).toFixed(2);
             document.getElementById('out-mat-855269').innerText = Math.round(totalPallets).toString();
             document.getElementById('out-mat-856925').innerText = Math.ceil(totalPallets * 2).toString();
             document.getElementById('out-mat-855222').innerText = boxes;
