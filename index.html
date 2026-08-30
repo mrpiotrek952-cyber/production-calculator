@@ -34,23 +34,31 @@
             align-items: center; 
             min-height: 100vh; 
             color: var(--text-main); 
+            margin: 0;
+            overflow: hidden;
         }
         
+        /* Domyślnie na telefonach zajmuje 100% szerokości i wysokości ekranu */
         .phone-frame {
-            width: 100%;
-            max-width: 414px;
+            width: 100vw;
             height: 100vh;
-            max-height: 850px;
             background: var(--bg-dark);
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
         }
 
-        @media (min-width: 450px) {
-            .phone-frame { border-radius: 44px; border: 12px solid #1e293b; height: 850px; }
+        /* Na większych ekranach (np. komputery/tablety) pojawia się ramka telefonu */
+        @media (min-width: 768px) {
+            .phone-frame {
+                width: 100%;
+                max-width: 414px;
+                height: 850px;
+                border-radius: 44px;
+                border: 12px solid #1e293b;
+                box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            }
         }
 
         .header {
@@ -66,55 +74,50 @@
         .header-brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
         
-        /* Nowe, bardziej naturalne, profesjonalne logo pączka (wersja realistyczna premium) */
         .donut-logo {
-            width: 42px;
-            height: 42px;
-            background: radial-gradient(circle at 30% 30%, #fde047 0%, #d97706 60%, #92400e 100%);
+            width: 46px;
+            height: 46px;
+            background: radial-gradient(circle, #f59e0b 0%, #d97706 100%);
             border-radius: 50%;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 14px rgba(217, 119, 6, 0.5), inset 0 2px 5px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.4);
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.25);
             flex-shrink: 0;
         }
-        /* Płynna, organiczna polewa z delikatnymi falami */
         .donut-logo::before {
             content: '';
             position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
-            background: radial-gradient(circle at 40% 30%, #fbcfe8 0%, #ec4899 70%, #be185d 100%);
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            background: radial-gradient(circle, #ec4899 0%, #be185d 100%);
             border-radius: 50%;
-            clip-path: polygon(50% 0%, 75% 5%, 95% 20%, 100% 45%, 90% 75%, 70% 95%, 45% 100%, 20% 90%, 5% 70%, 0% 45%, 10% 20%, 30% 5%);
-            box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6);
+            clip-path: polygon(0% 0%, 100% 0%, 100% 70%, 75% 100%, 0% 80%);
         }
-        /* Realistyczna dziurka w środku */
         .donut-logo::after {
             content: '';
             position: absolute;
-            width: 13px;
-            height: 13px;
+            width: 14px;
+            height: 14px;
             background: var(--bg-dark);
             border-radius: 50%;
             z-index: 2;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.7), 0 0 2px rgba(255,255,255,0.2);
         }
         .donut-text {
             position: absolute;
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 900;
             letter-spacing: -0.5px;
             color: #ffffff;
             z-index: 3;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(255,255,255,0.4);
             transform: translateY(-0.5px);
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
@@ -131,9 +134,9 @@
         
         .flags { display: flex; gap: 8px; margin-top: 10px; }
         .flag-btn {
-            background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 8px 12px; font-size: 18px; cursor: pointer; transition: 0.2s; color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+            background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 8px 14px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; color: var(--text-muted);
         }
-        .flag-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); }
+        .flag-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 0 12px var(--primary-glow); }
 
         .content {
             flex: 1;
@@ -513,19 +516,11 @@
             <div class="card">
                 <h2 id="process-header">📋 Proces Sheet</h2>
                 <p id="process-desc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Documentation and process specifications.</p>
-                
                 <div class="form-group">
-                    <label id="lbl-process-select">Select process</label>
-                    <select id="process-select" onchange="onProcessChange()">
-                        <option value="" disabled selected id="opt-process-default">-- Select process --</option>
-                        <option value="process-1" id="opt-p1">Process 1: Line preparation</option>
-                        <option value="process-2" id="opt-p2">Process 2: Chocolate coating</option>
-                        <option value="process-3" id="opt-p3">Process 3: Packaging and palletizing</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <textarea rows="6" readonly style="resize: none;" id="process-text">Select a process from the list above to view the documentation.</textarea>
+                    <textarea rows="6" readonly style="resize: none;" id="process-text">1. Check line readiness and parameters.
+2. Verify raw materials and packaging specs.
+3. Maintain standard speed parameters.
+4. Record waste and shift outputs regularly.</textarea>
                 </div>
                 <button class="btn-home" onclick="switchTab('home')" id="btn-home-process">🏠 Back to Home</button>
             </div>
@@ -549,10 +544,10 @@
                 <div class="form-group">
                     <label id="lbl-lang-select">Language / Język</label>
                     <div class="flags">
-                        <button class="flag-btn" onclick="setLang('pl', event)" title="Polski">🇵🇱</button>
-                        <button class="flag-btn" onclick="setLang('de', event)" title="Deutsch">🇩🇪</button>
-                        <button class="flag-btn" onclick="setLang('nl', event)" title="Nederlands">🇳🇱</button>
-                        <button class="flag-btn active" onclick="setLang('en', event)" title="English">🇬🇧</button>
+                        <button class="flag-btn" onclick="setLang('pl', event)">PL</button>
+                        <button class="flag-btn" onclick="setLang('de', event)">DE</button>
+                        <button class="flag-btn" onclick="setLang('nl', event)">NL</button>
+                        <button class="flag-btn active" onclick="setLang('en', event)">EN</button>
                     </div>
                 </div>
                 <p id="set-info" style="font-size: 13px; color: var(--text-muted); margin: 16px 0;">App Version: 2.20.0</p>
@@ -654,12 +649,6 @@
             // Process Sheet Tab
             processHeader: "📋 Proces Sheet",
             processDesc: "Documentation and process specifications.",
-            lblProcessSelect: "Select process",
-            optProcessDefault: "-- Select process --",
-            optP1: "Process 1: Line preparation",
-            optP2: "Process 2: Chocolate coating",
-            optP3: "Process 3: Packaging and palletizing",
-            defaultText: "Select a process from the list above to view the documentation.",
             btnHomeProcess: "🏠 Back to Home",
 
             // Notepad Tab
@@ -755,12 +744,6 @@
             // Process Sheet Tab
             processHeader: "📋 Proces Sheet",
             processDesc: "Dokumentacja i specyfikacja procesu.",
-            lblProcessSelect: "Wybierz proces",
-            optProcessDefault: "-- Wybierz proces --",
-            optP1: "Proces 1: Przygotowanie linii",
-            optP2: "Proces 2: Polewanie czekoladą",
-            optP3: "Proces 3: Pakowanie i paletyzacja",
-            defaultText: "Wybierz proces z listy powyżej, aby wyświetlić odpowiednią dokumentację.",
             btnHomeProcess: "🏠 Powrót do menu",
 
             // Notepad Tab
@@ -856,12 +839,6 @@
             // Process Sheet Tab
             processHeader: "📋 Proces Sheet",
             processDesc: "Prozessdokumentation und Spezifikationen.",
-            lblProcessSelect: "Prozess auswählen",
-            optProcessDefault: "-- Prozess auswählen --",
-            optP1: "Prozess 1: Linienvorbereitung",
-            optP2: "Prozess 2: Schokoladenüberzug",
-            optP3: "Prozess 3: Verpackung und Palettierung",
-            defaultText: "Wählen Sie einen Prozess aus der Liste oben aus, um die Dokumentation anzuzeigen.",
             btnHomeProcess: "🏠 Zurück zum Start",
 
             // Notepad Tab
@@ -957,12 +934,6 @@
             // Process Sheet Tab
             processHeader: "📋 Proces Sheet",
             processDesc: "Procesdocumentatie en specificaties.",
-            lblProcessSelect: "Selecteer proces",
-            optProcessDefault: "-- Selecteer proces --",
-            optP1: "Proces 1: Lijnvoorbereiding",
-            optP2: "Proces 2: Chocolade coating",
-            optP3: "Proces 3: Verpakking en palettering",
-            defaultText: "Selecteer een proces uit de lijst hierboven om de documentatie te bekijken.",
             btnHomeProcess: "🏠 Terug naar home",
 
             // Notepad Tab
@@ -981,27 +952,6 @@
             palletsWord: 'pallets',
             boxesWord: 'dozen',
             noneWord: 'Geen (volle pallets)'
-        }
-    };
-
-    const processData = {
-        'process-1': {
-            en: "1. Check line readiness and parameters.\n2. Verify raw materials and safety sensors.\n3. Calibrate dosing units.",
-            pl: "1. Sprawdź gotowość linii i parametry.\n2. Zweryfikuj surowce oraz czujniki bezpieczeństwa.\n3. Skalibruj jednostki dozujące.",
-            de: "1. Linienbereitschaft und Parameter prüfen.\n2. Rohstoffe und Sicherheitssensoren überprüfen.\n3. Dosiereinheiten kalibrieren.",
-            nl: "1. Controleer de gereedheid van de lijn en parameters.\n2. Verifieer grondstoffen en veiligheidssensoren.\n3. Kalibreer de doseereenheden."
-        },
-        'process-2': {
-            en: "1. Maintain chocolate temperature between 40-45°C.\n2. Check coating weight regularly.\n3. Monitor cooling tunnel speed.",
-            pl: "1. Utrzymuj temperaturę czekolady w zakresie 40-45°C.\n2. Regularnie sprawdzaj wagę polewy.\n3. Monitoruj prędkość tunelu chłodzącego.",
-            de: "1. Schokoladentemperatur zwischen 40-45°C halten.\n2. Überprüfen Sie das Überzugsgewicht regelmäßig.\n3. Überwachen Sie die Kühltunnelgeschwindigkeit.",
-            nl: "1. Houd de chocoladetemperatuur tussen 40-45°C.\n2. Controleer het coatinggewicht regelmatig.\n3. Bewaak de snelheid van de koeltunnel."
-        },
-        'process-3': {
-            en: "1. Verify correct box labeling and barcodes.\n2. Ensure proper pallet stacking pattern.\n3. Wrap pallet securely with stretch film.",
-            pl: "1. Zweryfikuj poprawne etykietowanie pudełek i kody kreskowe.\n2. Zadbaj o prawidłowy wzór układania na palecie.\n3. Zabezpiecz paletę folią stretch.",
-            de: "1. Korrekte Kartonetikettierung und Barcodes überprüfen.\n2. Auf korrekten Palettenstapelverband achten.\n3. Palette sicher mit Stretchfolie einwickeln.",
-            nl: "1. Verifieer correcte doosetikettering en barcodes.\n2. Zorg voor het juiste stapelpatroon op de pallet.\n3. Wikkel de pallet stevig in met stretchfolie."
         }
     };
 
@@ -1173,18 +1123,6 @@
         document.getElementById('m-palletboxes').value = "0";
     }
 
-    function onProcessChange() {
-        const selectedProcess = document.getElementById('process-select').value;
-        const textArea = document.getElementById('process-text');
-        const t = translations[currentLang] || translations['en'];
-        
-        if (selectedProcess && processData[selectedProcess]) {
-            textArea.value = processData[selectedProcess][currentLang] || processData[selectedProcess]['en'];
-        } else {
-            textArea.value = t.defaultText;
-        }
-    }
-
     function clearNotes() {
         document.getElementById('note-input').value = "";
     }
@@ -1192,8 +1130,8 @@
     function setLang(lang, event) {
         currentLang = lang;
         document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
-        if (event && event.currentTarget) {
-            event.currentTarget.classList.add('active');
+        if (event && event.target) {
+            event.target.classList.add('active');
         }
         applyTranslations();
     }
@@ -1250,6 +1188,7 @@
         document.getElementById('btn-home-prod').innerText = t.btnHomeProd;
 
         // Filling
+        document.getElementById('filling-header').innerText = t.fillHeader; // w razie gdyby zmienna ID różniła się w sekcjach
         document.getElementById('fill-header').innerText = t.fillHeader;
         document.getElementById('lbl-fill-boxes').innerText = t.lblFillBoxes;
         document.getElementById('lbl-fill-pcsbox').innerText = t.lblFillPcsBox;
@@ -1277,13 +1216,7 @@
         // Process Sheet
         document.getElementById('process-header').innerText = t.processHeader;
         document.getElementById('process-desc').innerText = t.processDesc;
-        document.getElementById('lbl-process-select').innerText = t.lblProcessSelect;
-        document.getElementById('opt-process-default').innerText = t.optProcessDefault;
-        document.getElementById('opt-p1').innerText = t.optP1;
-        document.getElementById('opt-p2').innerText = t.optP2;
-        document.getElementById('opt-p3').innerText = t.optP3;
         document.getElementById('btn-home-process').innerText = t.btnHomeProcess;
-        onProcessChange();
 
         // Notepad
         document.getElementById('notepad-header').innerText = t.notepadHeader;
