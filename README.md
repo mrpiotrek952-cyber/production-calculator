@@ -1,1 +1,1305 @@
-# production-calculator
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EP Production Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --accent: #ec4899;
+            --bg-dark: #090d16;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --success-border: rgba(16, 185, 129, 0.2);
+            --success-text: #34d399;
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.4);
+            --secondary-btn: rgba(100, 116, 139, 0.4);
+            --secondary-btn-hover: rgba(100, 116, 139, 0.6);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at top right, #1e1b4b, #090d16);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            color: var(--text-main); 
+        }
+        
+        .phone-frame {
+            width: 100%;
+            max-width: 414px;
+            height: 100vh;
+            max-height: 850px;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        @media (min-width: 450px) {
+            .phone-frame { border-radius: 44px; border: 12px solid #1e293b; height: 850px; }
+        }
+
+        .header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            z-index: 10;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Nowe, bardziej naturalne, profesjonalne logo pączka (wersja realistyczna premium) */
+        .donut-logo {
+            width: 42px;
+            height: 42px;
+            background: radial-gradient(circle at 30% 30%, #fde047 0%, #d97706 60%, #92400e 100%);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(217, 119, 6, 0.5), inset 0 2px 5px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.4);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            flex-shrink: 0;
+        }
+        /* Płynna, organiczna polewa z delikatnymi falami */
+        .donut-logo::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            background: radial-gradient(circle at 40% 30%, #fbcfe8 0%, #ec4899 70%, #be185d 100%);
+            border-radius: 50%;
+            clip-path: polygon(50% 0%, 75% 5%, 95% 20%, 100% 45%, 90% 75%, 70% 95%, 45% 100%, 20% 90%, 5% 70%, 0% 45%, 10% 20%, 30% 5%);
+            box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6);
+        }
+        /* Realistyczna dziurka w środku */
+        .donut-logo::after {
+            content: '';
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            background: var(--bg-dark);
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.7), 0 0 2px rgba(255,255,255,0.2);
+        }
+        .donut-text {
+            position: absolute;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            z-index: 3;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+            transform: translateY(-0.5px);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .header-title { 
+            font-size: 15px; 
+            font-weight: 800; 
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        
+        .flags { display: flex; gap: 8px; margin-top: 10px; }
+        .flag-btn {
+            background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 8px 12px; font-size: 18px; cursor: pointer; transition: 0.2s; color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+        }
+        .flag-btn.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 90px;
+        }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid var(--card-border);
+        }
+        
+        h2 { font-size: 15px; margin-bottom: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        input, select, textarea {
+            width: 100%; padding: 12px 14px; border: 1px solid var(--card-border); border-radius: 12px; font-size: 15px; font-weight: 600; outline: none; background: var(--input-bg); color: var(--text-main); transition: all 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(15, 23, 42, 0.9); box-shadow: 0 0 0 4px var(--primary-glow); }
+        
+        input[readonly] {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        select option { background: #0f172a; color: var(--text-main); }
+
+        .info-value-box {
+            width: 100%; padding: 12px 14px; border: 1px solid var(--success-border); border-radius: 12px; font-size: 15px; font-weight: 700; background: var(--success-bg); color: var(--success-text); display: flex; align-items: center; justify-content: space-between;
+        }
+        
+        .btn-reset {
+            width: 100%; padding: 12px; background: linear-gradient(135deg, var(--danger), #dc2626); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; text-align: center; box-shadow: 0 4px 14px var(--danger-glow); transition: 0.2s; margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-reset:active { transform: scale(0.98); }
+
+        .btn-home {
+            width: 100%; padding: 12px; background: var(--secondary-btn); color: white; border: 1px solid var(--card-border); border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; text-align: center; transition: 0.2s; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; backdrop-filter: blur(10px);
+        }
+        .btn-home:hover { background: var(--secondary-btn-hover); border-color: rgba(255,255,255,0.2); }
+        .btn-home:active { transform: scale(0.98); }
+
+        .result-box {
+            background: var(--success-bg); border: 1px solid var(--success-border); border-radius: 14px; padding: 14px; margin-top: 18px;
+        }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+        .result-row:last-child { margin-bottom: 0; }
+        .result-label { color: #a7f3d0; font-weight: 500; }
+        .result-val { font-weight: 700; color: var(--success-text); font-size: 14px; }
+
+        .result-row.highlight {
+            background: rgba(16, 185, 129, 0.15);
+            padding: 6px 8px;
+            border-radius: 8px;
+            margin: 4px -8px;
+            border-left: 3px solid var(--success-text);
+        }
+        .result-row.highlight .result-val { font-size: 15px; color: #6ee7b7; }
+
+        .section-header {
+            font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.8px; margin: 20px 0 12px 0; padding-bottom: 6px; border-bottom: 1px dashed var(--card-border); display: flex; align-items: center; gap: 6px;
+        }
+
+        .material-table {
+            width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 12px;
+        }
+        .material-table th, .material-table td {
+            border: 1px solid var(--card-border); padding: 8px 10px; text-align: left;
+        }
+        .material-table th { background: rgba(15, 23, 42, 0.8); color: #a7f3d0; font-weight: 700; }
+        .material-table td { background: rgba(15, 23, 42, 0.4); color: var(--text-main); font-weight: 600; }
+
+        .home-hero { text-align: center; padding: 10px 0 24px 0; }
+        .home-hero h1 { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 6px; }
+        .home-hero p { font-size: 13px; color: var(--text-muted); }
+        
+        .menu-btn {
+            display: flex; align-items: center; justify-content: space-between; width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 18px; text-align: left; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(12px);
+        }
+        .menu-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2); }
+        .menu-btn-content span { display: block; font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .menu-btn-content small { font-size: 12px; color: var(--text-muted); }
+        .menu-arrow { color: var(--text-muted); font-size: 18px; }
+
+        .nav-bar {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 72px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center; z-index: 10; padding-bottom: 8px;
+        }
+        .nav-item {
+            background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; font-size: 10px; font-weight: 600; flex: 1; transition: 0.2s;
+        }
+        .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <div class="header">
+        <div class="header-brand">
+            <div class="donut-logo">
+                <span class="donut-text">EP</span>
+            </div>
+            <div class="header-title" id="app-title">Production Calculator</div>
+        </div>
+    </div>
+
+    <div class="content">
+        
+        <div id="tab-home" class="tab-content active">
+            <div class="home-hero">
+                <h1 id="h-welcome">Welcome</h1>
+                <p id="h-desc">Select a calculator to start</p>
+            </div>
+            <button class="menu-btn" onclick="switchTab('chocolate')">
+                <div class="menu-btn-content">
+                    <span id="btn-choc-title">🍫 Chocolate Calculation</span>
+                    <small id="btn-choc-desc">Chocolate calculation per shift.</small>
+                </div>
+                <div class="menu-arrow">›</div>
+            </button>
+            <button class="menu-btn" onclick="switchTab('production')">
+                <div class="menu-btn-content">
+                    <span id="btn-prod-title">📦 Production & Pallets</span>
+                    <small id="btn-prod-desc">Production capacity calculation.</small>
+                </div>
+                <div class="menu-arrow">›</div>
+            </button>
+            <button class="menu-btn" onclick="switchTab('filling')">
+                <div class="menu-btn-content">
+                    <span id="btn-fill-title">🍓 Filling Calculation</span>
+                    <small id="btn-fill-desc">Filling requirement calculation.</small>
+                </div>
+                <div class="menu-arrow">›</div>
+            </button>
+            <button class="menu-btn" onclick="switchTab('materials')">
+                <div class="menu-btn-content">
+                    <span id="btn-mat-title">📦 Material Calculation</span>
+                    <small id="btn-mat-desc">Material consumption and packaging calculation.</small>
+                </div>
+                <div class="menu-arrow">›</div>
+            </button>
+            <button class="menu-btn" onclick="switchTab('process-sheet')">
+                <div class="menu-btn-content">
+                    <span id="btn-process-title">📋 Proces Sheet</span>
+                    <small id="btn-process-desc">View process documentation.</small>
+                </div>
+                <div class="menu-arrow">›</div>
+            </button>
+            <button class="menu-btn" onclick="switchTab('notepad')">
+                <div class="menu-btn-content">
+                    <span id="btn-notepad-title">📝 Notatnik</span>
+                    <small id="btn-notepad-desc">Quick notes and memos.</small>
+                </div>
+                <div class="menu-arrow">›</div>
+            </button>
+        </div>
+
+        <div id="tab-chocolate" class="tab-content">
+            <div class="card">
+                <h2 id="choc-header">🍫 Chocolate Calculation</h2>
+                <div class="form-group">
+                    <label id="lbl-choc-donut">Chocolate per donut (g)</label>
+                    <input type="number" id="c-donut" value="0" step="0.5" onfocus="handleFocus(this)" oninput="calcChocolate()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-dozen">Dozen count</label>
+                    <input type="number" id="c-dozen" value="0" onfocus="handleFocus(this)" oninput="calcChocolate()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-aantal-per-doos">Pieces per box</label>
+                    <input type="number" id="c-aperdoos" value="0" onfocus="handleFocus(this)" oninput="calcChocolate()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-afval">Packing waste (kg)</label>
+                    <input type="number" id="c-afval" value="0" step="1" onfocus="handleFocus(this)" oninput="calcChocolate()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-eind-gewicht">Final product weight (kg)</label>
+                    <input type="number" id="c-eind" value="0" step="1" onfocus="handleFocus(this)" oninput="calcChocolate()">
+                </div>
+
+                <div class="result-box">
+                    <div class="result-row"><span class="result-label" id="res-total-pcs">Total pieces:</span><span class="result-val" id="out-c-pcs">0</span></div>
+                    <div class="result-row"><span class="result-label" id="res-choc-rapport">Chocolate report:</span><span class="result-val" id="out-c-rapport">0.00 KG</span></div>
+                </div>
+
+                <button class="btn-reset" onclick="resetChocolate()" id="btn-reset-choc">↺ Reset Values</button>
+                <button class="btn-home" onclick="switchTab('home')" id="btn-home-choc">🏠 Back to Home</button>
+            </div>
+        </div>
+
+        <div id="tab-production" class="tab-content">
+            <div class="card">
+                <h2 id="prod-header">📦 Production & Pallet Calculator</h2>
+                
+                <div class="section-header" id="sec-prod-params">⚙️ Production Parameters</div>
+                <div class="form-group">
+                    <label id="lbl-speed">Speed (donuts/h)</label>
+                    <input type="number" id="p-speed" value="28600" readonly>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-hours">Working hours [h]</label>
+                    <input type="number" id="p-hours" value="0" step="0.5" onfocus="handleFocus(this)" oninput="calcProduction()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-pbox">Donuts per box</label>
+                    <input type="number" id="p-pbox" value="0" onfocus="handleFocus(this)" oninput="calcProduction()">
+                </div>
+
+                <div class="section-header" id="sec-palette-info">📊 Pallet Configuration</div>
+                <div class="form-group">
+                    <label id="lbl-pallete-type">Pallet Type</label>
+                    <select id="p-paltype" onchange="calcProduction()">
+                        <option value="eu-brown">EU-Brown</option>
+                        <option value="english">Englisch Pallet</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-layers-count">Layers on pallet</label>
+                    <input type="number" id="p-layerscount" value="0" onfocus="handleFocus(this)" oninput="calcProduction()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-boxes-per-layer">Boxes per layer</label>
+                    <input type="number" id="p-layerboxes" value="0" onfocus="handleFocus(this)" oninput="calcProduction()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-total-pal-boxes">Total boxes per full pallet</label>
+                    <div class="info-value-box">
+                        <span id="out-p-totalpalboxes">0</span>
+                        <span style="font-size: 11px; opacity: 0.7; font-weight: 600;" id="unit-boxes-text">boxes</span>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-row"><span class="result-label" id="res-all-pcs">Produced donuts:</span><span class="result-val" id="out-p-pcs">0</span></div>
+                    <div class="result-row"><span class="result-label" id="res-boxes">Full boxes:</span><span class="result-val" id="out-p-boxes">0</span></div>
+                    <div class="result-row highlight"><span class="result-label" id="res-pallets">Pallets:</span><span class="result-val" id="out-p-pallets">0.00</span></div>
+                    <div class="result-row"><span class="result-label" id="res-incomplete-pallet">Incomplete pallet (remainder):</span><span class="result-val" id="out-p-incomplete">0 boxes</span></div>
+                </div>
+
+                <button class="btn-reset" onclick="resetProduction()" id="btn-reset-prod">↺ Reset Values</button>
+                <button class="btn-home" onclick="switchTab('home')" id="btn-home-prod">🏠 Back to Home</button>
+            </div>
+        </div>
+
+        <div id="tab-filling" class="tab-content">
+            <div class="card">
+                <h2 id="fill-header">🍓 Filling Calculation</h2>
+                
+                <div class="form-group">
+                    <label id="lbl-fill-boxes">Number of produced boxes</label>
+                    <input type="number" id="f-boxes" value="0" onfocus="handleFocus(this)" oninput="calcFilling()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-fill-pcsbox">Donuts per box</label>
+                    <input type="number" id="f-pcsbox" value="0" onfocus="handleFocus(this)" oninput="calcFilling()">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-fill-gram">Filling per donut [g]</label>
+                    <input type="number" id="f-gram" value="0" step="0.5" onfocus="handleFocus(this)" oninput="calcFilling()">
+                </div>
+
+                <div class="result-box">
+                    <div class="result-row"><span class="result-label" id="res-fill-totalpcs">Total donuts:</span><span class="result-val" id="out-f-totalpcs">0</span></div>
+                    <div class="result-row"><span class="result-label" id="res-fill-total">Filling requirement:</span><span class="result-val" id="out-f-total">0.00 kg</span></div>
+                </div>
+
+                <button class="btn-reset" onclick="resetFilling()" id="btn-reset-fill">↺ Reset Values</button>
+                <button class="btn-home" onclick="switchTab('home')" id="btn-home-fill">🏠 Back to Home</button>
+            </div>
+        </div>
+
+        <div id="tab-materials" class="tab-content">
+            <div class="card">
+                <h2 id="mat-header">📦 Material Calculation</h2>
+                
+                <div class="form-group">
+                    <label id="lbl-product-select">Select Product</label>
+                    <select id="m-product" onchange="onProductChange()">
+                        <option value="" disabled selected id="opt-select-default">-- Select product --</option>
+                        <option value="produkt-2u">Produkt 2u</option>
+                        <option value="produkt-4u">Produkt 4u</option>
+                    </select>
+                </div>
+
+                <div id="m-dynamic-fields" style="display: none;">
+                    <div class="form-group">
+                        <label id="lbl-mat-boxes">Number of produced boxes</label>
+                        <input type="number" id="m-boxes" value="0" onfocus="handleFocus(this)" oninput="calcMaterials()">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-mat-pcsbox">Pieces per carton</label>
+                        <input type="number" id="m-pcsbox" value="0" onfocus="handleFocus(this)" oninput="calcMaterials()">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-mat-palletboxes">Boxes per pallet</label>
+                        <input type="number" id="m-palletboxes" value="0" onfocus="handleFocus(this)" oninput="calcMaterials()">
+                    </div>
+
+                    <div class="result-box">
+                        <div class="result-row"><span class="result-label" id="res-mat-totalpcs">Total Pieces / Blisters:</span><span class="result-val" id="out-m-totalpcs">0</span></div>
+                        <div class="result-row highlight"><span class="result-label" id="res-mat-pallets">Pallets:</span><span class="result-val" id="out-m-pallets">0</span></div>
+                    </div>
+
+                    <div id="product-table-container" style="display: none; margin-top: 16px;">
+                        <table class="material-table">
+                            <thead>
+                                <tr>
+                                    <th id="th-art">Art. No.</th>
+                                    <th id="th-name">Material Name</th>
+                                    <th id="th-sum">Total Usage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>855001</td>
+                                    <td>Seal PP 72x990 tarsp</td>
+                                    <td id="out-mat-855001">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>855158</td>
+                                    <td>Plastic Sheet</td>
+                                    <td id="out-mat-855158">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>856936</td>
+                                    <td>Ribbon 55x600 T26</td>
+                                    <td id="out-mat-856936">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>855060</td>
+                                    <td>Film Ecostrech 17</td>
+                                    <td id="out-mat-855060">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>855269</td>
+                                    <td>Eu-Brown</td>
+                                    <td id="out-mat-855269">0</td>
+                                </tr>
+                                <tr>
+                                    <td>856925</td>
+                                    <td>Palet Label</td>
+                                    <td id="out-mat-856925">0</td>
+                                </tr>
+                                <tr>
+                                    <td>855222</td>
+                                    <td>Box Label</td>
+                                    <td id="out-mat-855222">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <button class="btn-reset" onclick="resetMaterials()" id="btn-reset-mat">↺ Reset Values</button>
+                <button class="btn-home" onclick="switchTab('home')" id="btn-home-mat">🏠 Back to Home</button>
+            </div>
+        </div>
+
+        <div id="tab-process-sheet" class="tab-content">
+            <div class="card">
+                <h2 id="process-header">📋 Proces Sheet</h2>
+                <p id="process-desc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Documentation and process specifications.</p>
+                
+                <div class="form-group">
+                    <label id="lbl-process-select">Select process</label>
+                    <select id="process-select" onchange="onProcessChange()">
+                        <option value="" disabled selected id="opt-process-default">-- Select process --</option>
+                        <option value="process-1" id="opt-p1">Process 1: Line preparation</option>
+                        <option value="process-2" id="opt-p2">Process 2: Chocolate coating</option>
+                        <option value="process-3" id="opt-p3">Process 3: Packaging and palletizing</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <textarea rows="6" readonly style="resize: none;" id="process-text">Select a process from the list above to view the documentation.</textarea>
+                </div>
+                <button class="btn-home" onclick="switchTab('home')" id="btn-home-process">🏠 Back to Home</button>
+            </div>
+        </div>
+
+        <div id="tab-notepad" class="tab-content">
+            <div class="card">
+                <h2 id="notepad-header">📝 Notatnik</h2>
+                <p id="notepad-desc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Write down quick notes for your shift.</p>
+                <div class="form-group">
+                    <textarea rows="8" placeholder="Type your notes here..." id="note-input" style="resize: none;"></textarea>
+                </div>
+                <button class="btn-reset" onclick="clearNotes()" id="btn-clear-note">🗑️ Clear Notes</button>
+                <button class="btn-home" onclick="switchTab('home')" id="btn-home-note">🏠 Back to Home</button>
+            </div>
+        </div>
+
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <h2 id="set-header">System Settings</h2>
+                <div class="form-group">
+                    <label id="lbl-lang-select">Language / Język</label>
+                    <div class="flags">
+                        <button class="flag-btn" onclick="setLang('pl', event)" title="Polski">🇵🇱</button>
+                        <button class="flag-btn" onclick="setLang('de', event)" title="Deutsch">🇩🇪</button>
+                        <button class="flag-btn" onclick="setLang('nl', event)" title="Nederlands">🇳🇱</button>
+                        <button class="flag-btn active" onclick="setLang('en', event)" title="English">🇬🇧</button>
+                    </div>
+                </div>
+                <p id="set-info" style="font-size: 13px; color: var(--text-muted); margin: 16px 0;">App Version: 2.20.0</p>
+                <button class="btn-home" onclick="switchTab('home')" id="btn-home-set">🏠 Back to Home</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-bar">
+        <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span id="n-home">Home</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('settings')" id="nav-sets">
+            <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+            <span id="n-sets">Settings</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'en';
+
+    const translations = {
+        en: {
+            appTitle: "Production Calculator",
+            hWelcome: "Welcome",
+            hDesc: "Select a calculator to start",
+            btnChocTitle: "🍫 Chocolate Calculation",
+            btnChocDesc: "Chocolate calculation per shift.",
+            btnProdTitle: "📦 Production & Pallets",
+            btnProdDesc: "Production capacity calculation.",
+            btnFillTitle: "🍓 Filling Calculation",
+            btnFillDesc: "Filling requirement calculation.",
+            btnMatTitle: "📦 Material Calculation",
+            btnMatDesc: "Material consumption and packaging calculation.",
+            btnProcessTitle: "📋 Proces Sheet",
+            btnProcessDesc: "View process documentation.",
+            btnNotepadTitle: "📝 Notatnik",
+            btnNotepadDesc: "Quick notes and memos.",
+            
+            // Chocolate Tab
+            chocHeader: "🍫 Chocolate Calculation",
+            lblChocDonut: "Chocolate per donut (g)",
+            lblDozen: "Dozen count",
+            lblAantalPerDoos: "Pieces per box",
+            lblAfval: "Packing waste (kg)",
+            lblEindGewicht: "Final product weight (kg)",
+            resTotalPcs: "Total pieces:",
+            resChocRapport: "Chocolate report:",
+            btnResetChoc: "↺ Reset Values",
+            btnHomeChoc: "🏠 Back to Home",
+
+            // Production Tab
+            prodHeader: "📦 Production & Pallet Calculator",
+            secProdParams: "⚙️ Production Parameters",
+            lblSpeed: "Speed (donuts/h)",
+            lblHours: "Working hours [h]",
+            lblPbox: "Donuts per box",
+            secPaletteInfo: "📊 Pallet Configuration",
+            lblPalleteType: "Pallet Type",
+            lblLayersCount: "Layers on pallet",
+            lblBoxesPerLayer: "Boxes per layer",
+            lblTotalPalBoxes: "Total boxes per full pallet",
+            unitBoxesText: "boxes",
+            resAllPcs: "Produced donuts:",
+            resBoxes: "Full boxes:",
+            resPallets: "Pallets:",
+            resIncompletePallet: "Incomplete pallet (remainder):",
+            btnResetProd: "↺ Reset Values",
+            btnHomeProd: "🏠 Back to Home",
+
+            // Filling Tab
+            fillHeader: "🍓 Filling Calculation",
+            lblFillBoxes: "Number of produced boxes",
+            lblFillPcsBox: "Donuts per box",
+            lblFillGram: "Filling per donut [g]",
+            resFillTotalPcs: "Total donuts:",
+            resFillTotal: "Filling requirement:",
+            btnResetFill: "↺ Reset Values",
+            btnHomeFill: "🏠 Back to Home",
+
+            // Materials Tab
+            matHeader: "📦 Material Calculation",
+            lblProductSelect: "Select Product",
+            optSelectDefault: "-- Select product --",
+            lblMatBoxes: "Number of produced boxes",
+            lblMatPcsBox: "Pieces per carton",
+            lblMatPalletBoxes: "Boxes per pallet",
+            resMatTotalPcs: "Total Pieces / Blisters:",
+            resMatPallets: "Pallets:",
+            thArt: "Art. No.",
+            thName: "Material Name",
+            thSum: "Total Usage",
+            btnResetMat: "↺ Reset Values",
+            btnHomeMat: "🏠 Back to Home",
+
+            // Process Sheet Tab
+            processHeader: "📋 Proces Sheet",
+            processDesc: "Documentation and process specifications.",
+            lblProcessSelect: "Select process",
+            optProcessDefault: "-- Select process --",
+            optP1: "Process 1: Line preparation",
+            optP2: "Process 2: Chocolate coating",
+            optP3: "Process 3: Packaging and palletizing",
+            defaultText: "Select a process from the list above to view the documentation.",
+            btnHomeProcess: "🏠 Back to Home",
+
+            // Notepad Tab
+            notepadHeader: "📝 Notatnik",
+            notepadDesc: "Write down quick notes for your shift.",
+            btnClearNote: "🗑️ Clear Notes",
+            btnHomeNote: "🏠 Back to Home",
+
+            // Settings Tab
+            setHeader: "System Settings",
+            lblLangSelect: "Language / Język",
+            btnHomeSet: "🏠 Back to Home",
+            nHome: "Home",
+            nSets: "Settings",
+
+            palletsWord: 'pallets',
+            boxesWord: 'boxes',
+            noneWord: 'None (full pallets)'
+        },
+        pl: {
+            appTitle: "Kalkulator Produkcyjny",
+            hWelcome: "Witaj",
+            hDesc: "Wybierz kalkulator, aby rozpocząć",
+            btnChocTitle: "🍫 Kalkulacja Czekolady",
+            btnChocDesc: "Obliczanie zużycia czekolady na zmianę.",
+            btnProdTitle: "📦 Produkcja i Palety",
+            btnProdDesc: "Obliczanie wydajności produkcji.",
+            btnFillTitle: "🍓 Kalkulacja Nadzienia",
+            btnFillDesc: "Obliczanie zapotrzebowania na nadzienie.",
+            btnMatTitle: "📦 Kalkulacja Materiałów",
+            btnMatDesc: "Zużycie materiałów i opakowań.",
+            btnProcessTitle: "📋 Proces Sheet",
+            btnProcessDesc: "Dokumentacja i specyfikacja procesu.",
+            btnNotepadTitle: "📝 Notatnik",
+            btnNotepadDesc: "Szybkie notatki i zapiski.",
+            
+            // Chocolate Tab
+            chocHeader: "🍫 Kalkulacja Czekolady",
+            lblChocDonut: "Ilość czekolady w pączku (g)",
+            lblDozen: "Ilość tuzinów / paczek",
+            lblAantalPerDoos: "Sztuk w pudełku",
+            lblAfval: "Odpad na dziale pakowania (kg)",
+            lblEindGewicht: "Waga produktu finalnego (kg)",
+            resTotalPcs: "Suma sztuk:",
+            resChocRapport: "Raport czekolady:",
+            btnResetChoc: "↺ Resetuj wartości",
+            btnHomeChoc: "🏠 Powrót do menu",
+
+            // Production Tab
+            prodHeader: "📦 Kalkulator Produkcji i Palet",
+            secProdParams: "⚙️ Parametry Produkcji",
+            lblSpeed: "Prędkość (pączki/h)",
+            lblHours: "Godziny pracy [h]",
+            lblPbox: "Pączków w pudełku",
+            secPaletteInfo: "📊 Konfiguracja Palety",
+            lblPalleteType: "Rodzaj palety",
+            lblLayersCount: "Ilość warstw na palecie",
+            lblBoxesPerLayer: "Ilość pudełek na warstwie",
+            lblTotalPalBoxes: "Pudełek ogółem na palecie (pełna)",
+            unitBoxesText: "pudełek",
+            resAllPcs: "Wyprodukowane pączki:",
+            resBoxes: "Pełne pudełka:",
+            resPallets: "Palety:",
+            resIncompletePallet: "Niepełna paleta (reszta):",
+            btnResetProd: "↺ Resetuj wartości",
+            btnHomeProd: "🏠 Powrót do menu",
+
+            // Filling Tab
+            fillHeader: "🍓 Kalkulacja Nadzienia",
+            lblFillBoxes: "Liczba wyprodukowanych pudełek",
+            lblFillPcsBox: "Pączków w pudełku",
+            lblFillGram: "Nadzienie na pączka [g]",
+            resFillTotalPcs: "Suma pączków:",
+            resFillTotal: "Wymagane nadzienie:",
+            btnResetFill: "↺ Resetuj wartości",
+            btnHomeFill: "🏠 Powrót do menu",
+
+            // Materials Tab
+            matHeader: "📦 Kalkulacja Materiałów",
+            lblProductSelect: "Wybierz produkt",
+            optSelectDefault: "-- Wybierz produkt --",
+            lblMatBoxes: "Ilość wyprodukowanych pudełek",
+            lblMatPcsBox: "Ilość sztuk w kartonie",
+            lblMatPalletBoxes: "Ilość pudełek na palecie",
+            resMatTotalPcs: "Ilość Blisterów / Sztuk:",
+            resMatPallets: "Palety:",
+            thArt: "Nr art.",
+            thName: "Nazwa materiału",
+            thSum: "Suma zużycia",
+            btnResetMat: "↺ Resetuj wartości",
+            btnHomeMat: "🏠 Powrót do menu",
+
+            // Process Sheet Tab
+            processHeader: "📋 Proces Sheet",
+            processDesc: "Dokumentacja i specyfikacja procesu.",
+            lblProcessSelect: "Wybierz proces",
+            optProcessDefault: "-- Wybierz proces --",
+            optP1: "Proces 1: Przygotowanie linii",
+            optP2: "Proces 2: Polewanie czekoladą",
+            optP3: "Proces 3: Pakowanie i paletyzacja",
+            defaultText: "Wybierz proces z listy powyżej, aby wyświetlić odpowiednią dokumentację.",
+            btnHomeProcess: "🏠 Powrót do menu",
+
+            // Notepad Tab
+            notepadHeader: "📝 Notatnik",
+            notepadDesc: "Zapisz szybkie notatki dla swojej zmiany.",
+            btnClearNote: "🗑️ Wyczyść notatki",
+            btnHomeNote: "🏠 Powrót do menu",
+
+            // Settings Tab
+            setHeader: "Ustawienia Systemu",
+            lblLangSelect: "Język / Language",
+            btnHomeSet: "🏠 Powrót do menu",
+            nHome: "Start",
+            nSets: "Ustawienia",
+
+            palletsWord: 'palet',
+            boxesWord: 'pudełek',
+            noneWord: 'Brak (pełne palety)'
+        },
+        de: {
+            appTitle: "Produktionsrechner",
+            hWelcome: "Willkommen",
+            hDesc: "Wählen Sie einen Rechner aus",
+            btnChocTitle: "🍫 Schokoladenkalkulation",
+            btnChocDesc: "Schokoladenberechnung pro Schicht.",
+            btnProdTitle: "📦 Produktion & Paletten",
+            btnProdDesc: "Berechnung der Produktionskapazität.",
+            btnFillTitle: "🍓 Füllungskalkulation",
+            btnFillDesc: "Berechnung des Füllungsbedarfs.",
+            btnMatTitle: "📦 Materialkalkulation",
+            btnMatDesc: "Materialverbrauch und Verpackungsberechnung.",
+            btnProcessTitle: "📋 Proces Sheet",
+            btnProcessDesc: "Prozessdokumentation anzeigen.",
+            btnNotepadTitle: "📝 Notatnik",
+            btnNotepadDesc: "Schnelle Notizen und Memos.",
+            
+            // Chocolate Tab
+            chocHeader: "🍫 Schokoladenkalkulation",
+            lblChocDonut: "Schokolade pro Donut (g)",
+            lblDozen: "Dutzend Anzahl",
+            lblAantalPerDoos: "Stück pro Karton",
+            lblAfval: "Verpackungsabfall (kg)",
+            lblEindGewicht: "Endproduktgewicht (kg)",
+            resTotalPcs: "Gesamtstückzahl:",
+            resChocRapport: "Schokoladenbericht:",
+            btnResetChoc: "↺ Werte zurücksetzen",
+            btnHomeChoc: "🏠 Zurück zum Start",
+
+            // Production Tab
+            prodHeader: "📦 Produktions- & Palettenrechner",
+            secProdParams: "⚙️ Produktionsparameter",
+            lblSpeed: "Geschwindigkeit (Donuts/h)",
+            lblHours: "Arbeitsstunden [h]",
+            lblPbox: "Donuts pro Karton",
+            secPaletteInfo: "📊 Palettenkonfiguration",
+            lblPalleteType: "Palettentyp",
+            lblLayersCount: "Schichten auf Palette",
+            lblBoxesPerLayer: "Kartons pro Schicht",
+            lblTotalPalBoxes: "Gesamtkartons pro volle Palette",
+            unitBoxesText: "Kartons",
+            resAllPcs: "Produzierte Donuts:",
+            resBoxes: "Volle Kartons:",
+            resPallets: "Paletten:",
+            resIncompletePallet: "Unvollständige Palette (Rest):",
+            btnResetProd: "↺ Werte zurücksetzen",
+            btnHomeProd: "🏠 Zurück zum Start",
+
+            // Filling Tab
+            fillHeader: "🍓 Füllungskalkulation",
+            lblFillBoxes: "Anzahl produzierter Kartons",
+            lblFillPcsBox: "Donuts pro Karton",
+            lblFillGram: "Füllung pro Donut [g]",
+            resFillTotalPcs: "Gesamte Donuts:",
+            resFillTotal: "Füllungsbedarf:",
+            btnResetFill: "↺ Werte zurücksetzen",
+            btnHomeFill: "🏠 Zurück zum Start",
+
+            // Materials Tab
+            matHeader: "📦 Materialkalkulation",
+            lblProductSelect: "Produkt auswählen",
+            optSelectDefault: "-- Produkt auswählen --",
+            lblMatBoxes: "Anzahl produzierter Kartons",
+            lblMatPcsBox: "Stück pro Karton",
+            lblMatPalletBoxes: "Kartons pro Palette",
+            resMatTotalPcs: "Gesamtstückzahl / Blister:",
+            resMatPallets: "Paletten:",
+            thArt: "Art.-Nr.",
+            thName: "Materialbezeichnung",
+            thSum: "Gesamtverbrauch",
+            btnResetMat: "↺ Werte zurücksetzen",
+            btnHomeMat: "🏠 Zurück zum Start",
+
+            // Process Sheet Tab
+            processHeader: "📋 Proces Sheet",
+            processDesc: "Prozessdokumentation und Spezifikationen.",
+            lblProcessSelect: "Prozess auswählen",
+            optProcessDefault: "-- Prozess auswählen --",
+            optP1: "Prozess 1: Linienvorbereitung",
+            optP2: "Prozess 2: Schokoladenüberzug",
+            optP3: "Prozess 3: Verpackung und Palettierung",
+            defaultText: "Wählen Sie einen Prozess aus der Liste oben aus, um die Dokumentation anzuzeigen.",
+            btnHomeProcess: "🏠 Zurück zum Start",
+
+            // Notepad Tab
+            notepadHeader: "📝 Notatnik",
+            notepadDesc: "Notizen für die Schicht erfassen.",
+            btnClearNote: "🗑️ Notizen löschen",
+            btnHomeNote: "🏠 Zurück zum Start",
+
+            // Settings Tab
+            setHeader: "Systemeinstellungen",
+            lblLangSelect: "Sprache / Language",
+            btnHomeSet: "🏠 Zurück zum Start",
+            nHome: "Start",
+            nSets: "Einstellungen",
+
+            palletsWord: 'Paletten',
+            boxesWord: 'Kartons',
+            noneWord: 'Keine (volle Paletten)'
+        },
+        nl: {
+            appTitle: "Productie Calculator",
+            hWelcome: "Welkom",
+            hDesc: "Selecteer een calculator om te beginnen",
+            btnChocTitle: "🍫 Chocola Berekening",
+            btnChocDesc: "Chocoladeberekening per dienst.",
+            btnProdTitle: "📦 Productie & Pallets",
+            btnProdDesc: "Berekening productiecapaciteit.",
+            btnFillTitle: "🍓 Vulling Berekening",
+            btnFillDesc: "Berekening vullingsbehoefte.",
+            btnMatTitle: "📦 Materiaal Berekening",
+            btnMatDesc: "Materiaaleverbruik en verpakkingsberekening.",
+            btnProcessTitle: "📋 Proces Sheet",
+            btnProcessDesc: "Bekijk procesdocumentatie.",
+            btnNotepadTitle: "📝 Notatnik",
+            btnNotepadDesc: "Snelle notities en memo's.",
+            
+            // Chocolate Tab
+            chocHeader: "🍫 Chocola Berekening",
+            lblChocDonut: "Chocolade per donut (g)",
+            lblDozen: "Aantal dozen / eenheden",
+            lblAantalPerDoos: "Stuks per doos",
+            lblAfval: "Verpakkingsafval (kg)",
+            lblEindGewicht: "Eindproductgewicht (kg)",
+            resTotalPcs: "Totaal aantal stuks:",
+            resChocRapport: "Chocoladerapport:",
+            btnResetChoc: "↺ Waarden resetten",
+            btnHomeChoc: "🏠 Terug naar home",
+
+            // Production Tab
+            prodHeader: "📦 Productie & Pallet Calculator",
+            secProdParams: "⚙️ Productieparameters",
+            lblSpeed: "Snelheid (donuts/u)",
+            lblHours: "Werkuur [u]",
+            lblPbox: "Donuts per doos",
+            secPaletteInfo: "📊 Palletconfiguratie",
+            lblPalleteType: "Pallettype",
+            lblLayersCount: "Lagen op pallet",
+            lblBoxesPerLayer: "Dozen per laag",
+            lblTotalPalBoxes: "Totaal aantal dozen per volle pallet",
+            unitBoxesText: "dozen",
+            resAllPcs: "Geproduceerde donuts:",
+            resBoxes: "Volle dozen:",
+            resPallets: "Pallets:",
+            resIncompletePallet: "Onvolledige pallet (rest):",
+            btnResetProd: "↺ Waarden resetten",
+            btnHomeProd: "🏠 Terug naar home",
+
+            // Filling Tab
+            fillHeader: "🍓 Vulling Berekening",
+            lblFillBoxes: "Aantal geproduceerde dozen",
+            lblFillPcsBox: "Donuts per doos",
+            lblFillGram: "Vulling per donut [g]",
+            resFillTotalPcs: "Totaal aantal donuts:",
+            resFillTotal: "Vullingsbehoefte:",
+            btnResetFill: "↺ Waarden resetten",
+            btnHomeFill: "🏠 Terug naar home",
+
+            // Materials Tab
+            matHeader: "📦 Materiaal Berekening",
+            lblProductSelect: "Selecteer Product",
+            optSelectDefault: "-- Selecteer product --",
+            lblMatBoxes: "Aantal geproduceerde dozen",
+            lblMatPcsBox: "Stuks per doos",
+            lblMatPalletBoxes: "Dozen per pallet",
+            resMatTotalPcs: "Totaal stuks / Blisters:",
+            resMatPallets: "Pallets:",
+            thArt: "Art. Nr.",
+            thName: "Materiaarnaam",
+            thSum: "Totaalverbruik",
+            btnResetMat: "↺ Waarden resetten",
+            btnHomeMat: "🏠 Terug naar home",
+
+            // Process Sheet Tab
+            processHeader: "📋 Proces Sheet",
+            processDesc: "Procesdocumentatie en specificaties.",
+            lblProcessSelect: "Selecteer proces",
+            optProcessDefault: "-- Selecteer proces --",
+            optP1: "Proces 1: Lijnvoorbereiding",
+            optP2: "Proces 2: Chocolade coating",
+            optP3: "Proces 3: Verpakking en palettering",
+            defaultText: "Selecteer een proces uit de lijst hierboven om de documentatie te bekijken.",
+            btnHomeProcess: "🏠 Terug naar home",
+
+            // Notepad Tab
+            notepadHeader: "📝 Notatnik",
+            notepadDesc: "Schrijf snelle notities voor je dienst.",
+            btnClearNote: "🗑️ Notities wissen",
+            btnHomeNote: "🏠 Terug naar home",
+
+            // Settings Tab
+            setHeader: "Systeeminstellingen",
+            lblLangSelect: "Taal / Language",
+            btnHomeSet: "🏠 Terug naar home",
+            nHome: "Home",
+            nSets: "Instellingen",
+
+            palletsWord: 'pallets',
+            boxesWord: 'dozen',
+            noneWord: 'Geen (volle pallets)'
+        }
+    };
+
+    const processData = {
+        'process-1': {
+            en: "1. Check line readiness and parameters.\n2. Verify raw materials and safety sensors.\n3. Calibrate dosing units.",
+            pl: "1. Sprawdź gotowość linii i parametry.\n2. Zweryfikuj surowce oraz czujniki bezpieczeństwa.\n3. Skalibruj jednostki dozujące.",
+            de: "1. Linienbereitschaft und Parameter prüfen.\n2. Rohstoffe und Sicherheitssensoren überprüfen.\n3. Dosiereinheiten kalibrieren.",
+            nl: "1. Controleer de gereedheid van de lijn en parameters.\n2. Verifieer grondstoffen en veiligheidssensoren.\n3. Kalibreer de doseereenheden."
+        },
+        'process-2': {
+            en: "1. Maintain chocolate temperature between 40-45°C.\n2. Check coating weight regularly.\n3. Monitor cooling tunnel speed.",
+            pl: "1. Utrzymuj temperaturę czekolady w zakresie 40-45°C.\n2. Regularnie sprawdzaj wagę polewy.\n3. Monitoruj prędkość tunelu chłodzącego.",
+            de: "1. Schokoladentemperatur zwischen 40-45°C halten.\n2. Überprüfen Sie das Überzugsgewicht regelmäßig.\n3. Überwachen Sie die Kühltunnelgeschwindigkeit.",
+            nl: "1. Houd de chocoladetemperatuur tussen 40-45°C.\n2. Controleer het coatinggewicht regelmatig.\n3. Bewaak de snelheid van de koeltunnel."
+        },
+        'process-3': {
+            en: "1. Verify correct box labeling and barcodes.\n2. Ensure proper pallet stacking pattern.\n3. Wrap pallet securely with stretch film.",
+            pl: "1. Zweryfikuj poprawne etykietowanie pudełek i kody kreskowe.\n2. Zadbaj o prawidłowy wzór układania na palecie.\n3. Zabezpiecz paletę folią stretch.",
+            de: "1. Korrekte Kartonetikettierung und Barcodes überprüfen.\n2. Auf korrekten Palettenstapelverband achten.\n3. Palette sicher mit Stretchfolie einwickeln.",
+            nl: "1. Verifieer correcte doosetikettering en barcodes.\n2. Zorg voor het juiste stapelpatroon op de pallet.\n3. Wikkel de pallet stevig in met stretchfolie."
+        }
+    };
+
+    function handleFocus(input) {
+        if (input.value === "0") {
+            input.value = "";
+        } else {
+            input.select();
+        }
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('tab-' + tabId).classList.add('active');
+        
+        const navMap = { 'home': 'nav-home', 'settings': 'nav-sets' };
+        if(navMap[tabId]) document.getElementById(navMap[tabId]).classList.add('active');
+        
+        document.querySelector('.content').scrollTop = 0;
+    }
+
+    function calcChocolate() {
+        const chocPerDonut = parseFloat(document.getElementById('c-donut').value) || 0;
+        const dozen = parseFloat(document.getElementById('c-dozen').value) || 0;
+        const aantalPerDoos = parseFloat(document.getElementById('c-aperdoos').value) || 0;
+        const afvalIn200 = parseFloat(document.getElementById('c-afval').value) || 0;
+        const eindGewichtProduct = parseFloat(document.getElementById('c-eind').value) || 0;
+
+        const totalPcs = dozen * aantalPerDoos;
+
+        const part1 = (chocPerDonut / 1000) * dozen * aantalPerDoos;
+        const part2 = eindGewichtProduct > 0 ? (afvalIn200 / (eindGewichtProduct / 1000)) * (chocPerDonut / 1000) : 0;
+        const chocolatRapport = part1 + part2;
+
+        document.getElementById('out-c-pcs').innerText = totalPcs.toLocaleString();
+        document.getElementById('out-c-rapport').innerText = chocolatRapport.toFixed(2) + ' KG';
+    }
+
+    function resetChocolate() {
+        document.getElementById('c-donut').value = "0";
+        document.getElementById('c-dozen').value = "0";
+        document.getElementById('c-aperdoos').value = "0";
+        document.getElementById('c-afval').value = "0";
+        document.getElementById('c-eind').value = "0";
+        calcChocolate();
+    }
+
+    function calcProduction() {
+        const speed = parseFloat(document.getElementById('p-speed').value) || 0;
+        const hours = parseFloat(document.getElementById('p-hours').value) || 0;
+        const pbox = parseFloat(document.getElementById('p-pbox').value) || 0;
+
+        const layersCount = parseFloat(document.getElementById('p-layerscount').value) || 0;
+        const layerBoxes = parseFloat(document.getElementById('p-layerboxes').value) || 0;
+
+        const boxesPerFullPalette = layersCount * layerBoxes;
+        document.getElementById('out-p-totalpalboxes').innerText = boxesPerFullPalette.toLocaleString();
+
+        const totalPcs = speed * hours;
+        const totalBoxes = pbox > 0 ? Math.round(totalPcs / pbox) : 0;
+        
+        let fullPallets = 0;
+        let incompleteBoxes = 0;
+        let palletsDisplay = "0.00";
+
+        if (boxesPerFullPalette > 0) {
+            fullPallets = Math.floor(totalBoxes / boxesPerFullPalette);
+            incompleteBoxes = totalBoxes % boxesPerFullPalette;
+            const exactPallets = totalBoxes / boxesPerFullPalette;
+            palletsDisplay = exactPallets.toFixed(2);
+        }
+
+        const t = translations[currentLang] || translations['en'];
+
+        document.getElementById('out-p-pcs').innerText = totalPcs.toLocaleString();
+        document.getElementById('out-p-boxes').innerText = totalBoxes.toLocaleString();
+        document.getElementById('out-p-pallets').innerText = palletsDisplay;
+        
+        if (boxesPerFullPalette > 0 && incompleteBoxes > 0) {
+            document.getElementById('out-p-incomplete').innerText = `${fullPallets} ${t.palletsWord}, + ${incompleteBoxes} ${t.boxesWord}`;
+        } else if (boxesPerFullPalette > 0 && totalBoxes > 0) {
+            document.getElementById('out-p-incomplete').innerText = t.noneWord;
+        } else {
+            document.getElementById('out-p-incomplete').innerText = "0";
+        }
+    }
+
+    function resetProduction() {
+        document.getElementById('p-speed').value = "28600";
+        document.getElementById('p-hours').value = "0";
+        document.getElementById('p-pbox').value = "0";
+        document.getElementById('p-layerscount').value = "0";
+        document.getElementById('p-layerboxes').value = "0";
+        calcProduction();
+    }
+
+    function calcFilling() {
+        const boxes = parseFloat(document.getElementById('f-boxes').value) || 0;
+        const pcsbox = parseFloat(document.getElementById('f-pcsbox').value) || 0;
+        const gram = parseFloat(document.getElementById('f-gram').value) || 0;
+
+        const totalPcs = boxes * pcsbox;
+        const totalKg = (totalPcs * gram) / 1000;
+
+        document.getElementById('out-f-totalpcs').innerText = totalPcs.toLocaleString();
+        document.getElementById('out-f-total').innerText = totalKg.toFixed(2) + ' kg';
+    }
+
+    function resetFilling() {
+        document.getElementById('f-boxes').value = "0";
+        document.getElementById('f-pcsbox').value = "0";
+        document.getElementById('f-gram').value = "0";
+        calcFilling();
+    }
+
+    function onProductChange() {
+        const product = document.getElementById('m-product').value;
+        const dynFields = document.getElementById('m-dynamic-fields');
+        const tableContainer = document.getElementById('product-table-container');
+
+        if (product) {
+            dynFields.style.display = 'block';
+            tableContainer.style.display = 'block';
+            calcMaterials();
+        } else {
+            dynFields.style.display = 'none';
+        }
+    }
+
+    function calcMaterials() {
+        const boxes = parseFloat(document.getElementById('m-boxes').value) || 0;
+        const pcsbox = parseFloat(document.getElementById('m-pcsbox').value) || 0;
+        const palletboxes = parseFloat(document.getElementById('m-palletboxes').value) || 0;
+
+        const totalPcs = boxes * pcsbox;
+        const totalPallets = palletboxes > 0 ? (boxes / palletboxes) : 0;
+
+        document.getElementById('out-m-totalpcs').innerText = totalPcs.toLocaleString();
+        document.getElementById('out-m-pallets').innerText = Math.round(totalPallets).toString();
+
+        const product = document.getElementById('m-product').value;
+        if (product === 'produkt-2u') {
+            document.getElementById('out-mat-855001').innerText = (boxes * 1.05).toFixed(2);
+            document.getElementById('out-mat-855158').innerText = (totalPcs * 0.31).toFixed(2);
+            document.getElementById('out-mat-856936').innerText = (totalPcs * 0.0033).toFixed(2);
+            document.getElementById('out-mat-855060').innerText = (totalPallets * 0.5).toFixed(2);
+            document.getElementById('out-mat-855269').innerText = Math.round(totalPallets).toString();
+            document.getElementById('out-mat-856925').innerText = Math.ceil(totalPallets * 2).toString();
+            document.getElementById('out-mat-855222').innerText = boxes;
+        } else if (product === 'produkt-4u') {
+            document.getElementById('out-mat-855001').innerText = (boxes * 1.20).toFixed(2);
+            document.getElementById('out-mat-855158').innerText = (totalPcs * 0.40).toFixed(2);
+            document.getElementById('out-mat-856936').innerText = (totalPcs * 0.0040).toFixed(2);
+            document.getElementById('out-mat-855060').innerText = (totalPallets * 0.6).toFixed(2);
+            document.getElementById('out-mat-855269').innerText = Math.round(totalPallets).toString();
+            document.getElementById('out-mat-856925').innerText = Math.ceil(totalPallets * 2).toString();
+            document.getElementById('out-mat-855222').innerText = boxes;
+        }
+    }
+
+    function resetMaterials() {
+        document.getElementById('m-product').value = "";
+        document.getElementById('m-dynamic-fields').style.display = 'none';
+        document.getElementById('product-table-container').style.display = 'none';
+        document.getElementById('m-boxes').value = "0";
+        document.getElementById('m-pcsbox').value = "0";
+        document.getElementById('m-palletboxes').value = "0";
+    }
+
+    function onProcessChange() {
+        const selectedProcess = document.getElementById('process-select').value;
+        const textArea = document.getElementById('process-text');
+        const t = translations[currentLang] || translations['en'];
+        
+        if (selectedProcess && processData[selectedProcess]) {
+            textArea.value = processData[selectedProcess][currentLang] || processData[selectedProcess]['en'];
+        } else {
+            textArea.value = t.defaultText;
+        }
+    }
+
+    function clearNotes() {
+        document.getElementById('note-input').value = "";
+    }
+
+    function setLang(lang, event) {
+        currentLang = lang;
+        document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
+        applyTranslations();
+    }
+
+    function applyTranslations() {
+        const t = translations[currentLang];
+        if (!t) return;
+
+        document.getElementById('app-title').innerText = t.appTitle;
+        document.getElementById('h-welcome').innerText = t.hWelcome;
+        document.getElementById('h-desc').innerText = t.hDesc;
+        document.getElementById('btn-choc-title').innerText = t.btnChocTitle;
+        document.getElementById('btn-choc-desc').innerText = t.btnChocDesc;
+        document.getElementById('btn-prod-title').innerText = t.btnProdTitle;
+        document.getElementById('btn-prod-desc').innerText = t.btnProdDesc;
+        document.getElementById('btn-fill-title').innerText = t.btnFillTitle;
+        document.getElementById('btn-fill-desc').innerText = t.btnFillDesc;
+        document.getElementById('btn-mat-title').innerText = t.btnMatTitle;
+        document.getElementById('btn-mat-desc').innerText = t.btnMatDesc;
+        document.getElementById('btn-process-title').innerText = t.btnProcessTitle;
+        document.getElementById('btn-process-desc').innerText = t.btnProcessDesc;
+        document.getElementById('btn-notepad-title').innerText = t.btnNotepadTitle;
+        document.getElementById('btn-notepad-desc').innerText = t.btnNotepadDesc;
+
+        // Chocolate
+        document.getElementById('choc-header').innerText = t.chocHeader;
+        document.getElementById('lbl-choc-donut').innerText = t.lblChocDonut;
+        document.getElementById('lbl-dozen').innerText = t.lblDozen;
+        document.getElementById('lbl-aantal-per-doos').innerText = t.lblAantalPerDoos;
+        document.getElementById('lbl-afval').innerText = t.lblAfval;
+        document.getElementById('lbl-eind-gewicht').innerText = t.lblEindGewicht;
+        document.getElementById('res-total-pcs').innerText = t.resTotalPcs;
+        document.getElementById('res-choc-rapport').innerText = t.resChocRapport;
+        document.getElementById('btn-reset-choc').innerText = t.btnResetChoc;
+        document.getElementById('btn-home-choc').innerText = t.btnHomeChoc;
+
+        // Production
+        document.getElementById('prod-header').innerText = t.prodHeader;
+        document.getElementById('sec-prod-params').innerText = t.secProdParams;
+        document.getElementById('lbl-speed').innerText = t.lblSpeed;
+        document.getElementById('lbl-hours').innerText = t.lblHours;
+        document.getElementById('lbl-pbox').innerText = t.lblPbox;
+        document.getElementById('sec-palette-info').innerText = t.secPaletteInfo;
+        document.getElementById('lbl-pallete-type').innerText = t.lblPalleteType;
+        document.getElementById('lbl-layers-count').innerText = t.lblLayersCount;
+        document.getElementById('lbl-boxes-per-layer').innerText = t.lblBoxesPerLayer;
+        document.getElementById('lbl-total-pal-boxes').innerText = t.lblTotalPalBoxes;
+        document.getElementById('unit-boxes-text').innerText = t.unitBoxesText;
+        document.getElementById('res-all-pcs').innerText = t.resAllPcs;
+        document.getElementById('res-boxes').innerText = t.resBoxes;
+        document.getElementById('res-pallets').innerText = t.resPallets;
+        document.getElementById('res-incomplete-pallet').innerText = t.resIncompletePallet;
+        document.getElementById('btn-reset-prod').innerText = t.btnResetProd;
+        document.getElementById('btn-home-prod').innerText = t.btnHomeProd;
+
+        // Filling
+        document.getElementById('fill-header').innerText = t.fillHeader;
+        document.getElementById('lbl-fill-boxes').innerText = t.lblFillBoxes;
+        document.getElementById('lbl-fill-pcsbox').innerText = t.lblFillPcsBox;
+        document.getElementById('lbl-fill-gram').innerText = t.lblFillGram;
+        document.getElementById('res-fill-totalpcs').innerText = t.resFillTotalPcs;
+        document.getElementById('res-fill-total').innerText = t.resFillTotal;
+        document.getElementById('btn-reset-fill').innerText = t.btnResetFill;
+        document.getElementById('btn-home-fill').innerText = t.btnHomeFill;
+
+        // Materials
+        document.getElementById('mat-header').innerText = t.matHeader;
+        document.getElementById('lbl-product-select').innerText = t.lblProductSelect;
+        document.getElementById('opt-select-default').innerText = t.optSelectDefault;
+        document.getElementById('lbl-mat-boxes').innerText = t.lblMatBoxes;
+        document.getElementById('lbl-mat-pcsbox').innerText = t.lblMatPcsBox;
+        document.getElementById('lbl-mat-palletboxes').innerText = t.lblMatPalletBoxes;
+        document.getElementById('res-mat-totalpcs').innerText = t.resMatTotalPcs;
+        document.getElementById('res-mat-pallets').innerText = t.resMatPallets;
+        document.getElementById('th-art').innerText = t.thArt;
+        document.getElementById('th-name').innerText = t.thName;
+        document.getElementById('th-sum').innerText = t.thSum;
+        document.getElementById('btn-reset-mat').innerText = t.btnResetMat;
+        document.getElementById('btn-home-mat').innerText = t.btnHomeMat;
+
+        // Process Sheet
+        document.getElementById('process-header').innerText = t.processHeader;
+        document.getElementById('process-desc').innerText = t.processDesc;
+        document.getElementById('lbl-process-select').innerText = t.lblProcessSelect;
+        document.getElementById('opt-process-default').innerText = t.optProcessDefault;
+        document.getElementById('opt-p1').innerText = t.optP1;
+        document.getElementById('opt-p2').innerText = t.optP2;
+        document.getElementById('opt-p3').innerText = t.optP3;
+        document.getElementById('btn-home-process').innerText = t.btnHomeProcess;
+        onProcessChange();
+
+        // Notepad
+        document.getElementById('notepad-header').innerText = t.notepadHeader;
+        document.getElementById('notepad-desc').innerText = t.notepadDesc;
+        document.getElementById('btn-clear-note').innerText = t.btnClearNote;
+        document.getElementById('btn-home-note').innerText = t.btnHomeNote;
+
+        // Settings & Nav
+        document.getElementById('set-header').innerText = t.setHeader;
+        document.getElementById('lbl-lang-select').innerText = t.lblLangSelect;
+        document.getElementById('btn-home-set').innerText = t.btnHomeSet;
+        document.getElementById('n-home').innerText = t.nHome;
+        document.getElementById('n-sets').innerText = t.nSets;
+
+        calcProduction();
+    }
+</script>
+</body>
+</html>
