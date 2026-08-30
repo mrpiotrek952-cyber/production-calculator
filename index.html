@@ -38,7 +38,6 @@
             overflow: hidden;
         }
         
-        /* Domyślnie na telefonach zajmuje 100% szerokości i wysokości ekranu */
         .phone-frame {
             width: 100vw;
             height: 100vh;
@@ -49,7 +48,6 @@
             overflow: hidden;
         }
 
-        /* Na większych ekranach (np. komputery/tablety) pojawia się ramka telefonu */
         @media (min-width: 768px) {
             .phone-frame {
                 width: 100%;
@@ -189,6 +187,11 @@
         }
         .btn-reset:active { transform: scale(0.98); }
 
+        .btn-action {
+            width: 100%; padding: 12px; background: linear-gradient(135deg, var(--primary), #4f46e5); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; text-align: center; box-shadow: 0 4px 14px var(--primary-glow); transition: 0.2s; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-action:active { transform: scale(0.98); }
+
         .btn-home {
             width: 100%; padding: 12px; background: var(--secondary-btn); color: white; border: 1px solid var(--card-border); border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; text-align: center; transition: 0.2s; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; backdrop-filter: blur(10px);
         }
@@ -236,6 +239,52 @@
         .menu-btn-content span { display: block; font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
         .menu-btn-content small { font-size: 12px; color: var(--text-muted); }
         .menu-arrow { color: var(--text-muted); font-size: 18px; }
+
+        /* Style dla listy i edytora notatek */
+        .note-item {
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .note-item:hover {
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.9);
+        }
+        .note-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+        .note-info small {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .note-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 6px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .btn-icon:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
 
         .nav-bar {
             position: absolute; bottom: 0; left: 0; right: 0; height: 72px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center; z-index: 10; padding-bottom: 8px;
@@ -526,15 +575,39 @@
             </div>
         </div>
 
+        <!-- NOTATNIK - LISTA NOTATEK -->
         <div id="tab-notepad" class="tab-content">
             <div class="card">
                 <h2 id="notepad-header">📝 Notatnik</h2>
-                <p id="notepad-desc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Write down quick notes for your shift.</p>
-                <div class="form-group">
-                    <textarea rows="8" placeholder="Type your notes here..." id="note-input" style="resize: none;"></textarea>
+                <p id="notepad-desc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Manage your shift notes.</p>
+                
+                <button class="btn-action" onclick="openNoteEditor()" id="btn-new-note">+ Nowa Notatka</button>
+                
+                <div id="notes-list-container" style="max-height: 380px; overflow-y: auto; margin-bottom: 14px;">
+                    <!-- Tutaj dynamicznie ładują się notatki -->
                 </div>
-                <button class="btn-reset" onclick="clearNotes()" id="btn-clear-note">🗑️ Clear Notes</button>
+
                 <button class="btn-home" onclick="switchTab('home')" id="btn-home-note">🏠 Back to Home</button>
+            </div>
+        </div>
+
+        <!-- NOTATNIK - EDYTOR POJEDYNCZEJ NOTATKI -->
+        <div id="tab-note-editor" class="tab-content">
+            <div class="card">
+                <h2 id="editor-header">✏️ Edycja Notatki</h2>
+                
+                <div class="form-group">
+                    <label id="lbl-note-title">Tytuł notatki</label>
+                    <input type="text" id="note-title-input" placeholder="Wpisz tytuł..." oninput="autoSaveCurrentNote()">
+                </div>
+                
+                <div class="form-group">
+                    <label id="lbl-note-content">Treść</label>
+                    <textarea rows="8" placeholder="Treść notatki..." id="note-body-input" style="resize: none;" oninput="autoSaveCurrentNote()"></textarea>
+                </div>
+
+                <button class="btn-reset" onclick="deleteCurrentNote()" id="btn-delete-note">🗑️ Usuń tę notatkę</button>
+                <button class="btn-home" onclick="closeNoteEditor()" id="btn-back-notes">← Powrót do listy</button>
             </div>
         </div>
 
@@ -550,7 +623,7 @@
                         <button class="flag-btn active" onclick="setLang('en', event)">EN</button>
                     </div>
                 </div>
-                <p id="set-info" style="font-size: 13px; color: var(--text-muted); margin: 16px 0;">App Version: 2.20.0</p>
+                <p id="set-info" style="font-size: 13px; color: var(--text-muted); margin: 16px 0;">App Version: 2.22.0</p>
                 <button class="btn-home" onclick="switchTab('home')" id="btn-home-set">🏠 Back to Home</button>
             </div>
         </div>
@@ -571,6 +644,8 @@
 
 <script>
     let currentLang = 'en';
+    let notes = [];
+    let currentEditingId = null;
 
     const translations = {
         en: {
@@ -590,7 +665,6 @@
             btnNotepadTitle: "📝 Notatnik",
             btnNotepadDesc: "Quick notes and memos.",
             
-            // Chocolate Tab
             chocHeader: "🍫 Chocolate Calculation",
             lblChocDonut: "Chocolate per donut (g)",
             lblDozen: "Dozen count",
@@ -602,7 +676,6 @@
             btnResetChoc: "↺ Reset Values",
             btnHomeChoc: "🏠 Back to Home",
 
-            // Production Tab
             prodHeader: "📦 Production & Pallet Calculator",
             secProdParams: "⚙️ Production Parameters",
             lblSpeed: "Speed (donuts/h)",
@@ -621,7 +694,6 @@
             btnResetProd: "↺ Reset Values",
             btnHomeProd: "🏠 Back to Home",
 
-            // Filling Tab
             fillHeader: "🍓 Filling Calculation",
             lblFillBoxes: "Number of produced boxes",
             lblFillPcsBox: "Donuts per box",
@@ -631,7 +703,6 @@
             btnResetFill: "↺ Reset Values",
             btnHomeFill: "🏠 Back to Home",
 
-            // Materials Tab
             matHeader: "📦 Material Calculation",
             lblProductSelect: "Select Product",
             optSelectDefault: "-- Select product --",
@@ -646,18 +717,20 @@
             btnResetMat: "↺ Reset Values",
             btnHomeMat: "🏠 Back to Home",
 
-            // Process Sheet Tab
             processHeader: "📋 Proces Sheet",
             processDesc: "Documentation and process specifications.",
             btnHomeProcess: "🏠 Back to Home",
 
-            // Notepad Tab
             notepadHeader: "📝 Notatnik",
-            notepadDesc: "Write down quick notes for your shift.",
-            btnClearNote: "🗑️ Clear Notes",
+            notepadDesc: "Manage your shift notes.",
+            btnNewNote: "+ New Note",
+            editorHeader: "✏️ Note Editor",
+            lblNoteTitle: "Note Title",
+            lblNoteContent: "Content",
+            btnDeleteNote: "🗑️ Delete this note",
+            btnBackNotes: "← Back to notes list",
             btnHomeNote: "🏠 Back to Home",
 
-            // Settings Tab
             setHeader: "System Settings",
             lblLangSelect: "Language / Język",
             btnHomeSet: "🏠 Back to Home",
@@ -666,7 +739,8 @@
 
             palletsWord: 'pallets',
             boxesWord: 'boxes',
-            noneWord: 'None (full pallets)'
+            noneWord: 'None (full pallets)',
+            untitledNote: 'Untitled Note'
         },
         pl: {
             appTitle: "Kalkulator Produkcyjny",
@@ -685,7 +759,6 @@
             btnNotepadTitle: "📝 Notatnik",
             btnNotepadDesc: "Szybkie notatki i zapiski.",
             
-            // Chocolate Tab
             chocHeader: "🍫 Kalkulacja Czekolady",
             lblChocDonut: "Ilość czekolady w pączku (g)",
             lblDozen: "Ilość tuzinów / paczek",
@@ -697,7 +770,6 @@
             btnResetChoc: "↺ Resetuj wartości",
             btnHomeChoc: "🏠 Powrót do menu",
 
-            // Production Tab
             prodHeader: "📦 Kalkulator Produkcji i Palet",
             secProdParams: "⚙️ Parametry Produkcji",
             lblSpeed: "Prędkość (pączki/h)",
@@ -716,7 +788,6 @@
             btnResetProd: "↺ Resetuj wartości",
             btnHomeProd: "🏠 Powrót do menu",
 
-            // Filling Tab
             fillHeader: "🍓 Kalkulacja Nadzienia",
             lblFillBoxes: "Liczba wyprodukowanych pudełek",
             lblFillPcsBox: "Pączków w pudełku",
@@ -726,7 +797,6 @@
             btnResetFill: "↺ Resetuj wartości",
             btnHomeFill: "🏠 Powrót do menu",
 
-            // Materials Tab
             matHeader: "📦 Kalkulacja Materiałów",
             lblProductSelect: "Wybierz produkt",
             optSelectDefault: "-- Wybierz produkt --",
@@ -741,18 +811,20 @@
             btnResetMat: "↺ Resetuj wartości",
             btnHomeMat: "🏠 Powrót do menu",
 
-            // Process Sheet Tab
             processHeader: "📋 Proces Sheet",
             processDesc: "Dokumentacja i specyfikacja procesu.",
             btnHomeProcess: "🏠 Powrót do menu",
 
-            // Notepad Tab
             notepadHeader: "📝 Notatnik",
-            notepadDesc: "Zapisz szybkie notatki dla swojej zmiany.",
-            btnClearNote: "🗑️ Wyczyść notatki",
+            notepadDesc: "Zarządzaj notatkami ze zmiany.",
+            btnNewNote: "+ Nowa Notatka",
+            editorHeader: "✏️ Edycja Notatki",
+            lblNoteTitle: "Tytuł notatki",
+            lblNoteContent: "Treść",
+            btnDeleteNote: "🗑️ Usuń tę notatkę",
+            btnBackNotes: "← Powrót do listy",
             btnHomeNote: "🏠 Powrót do menu",
 
-            // Settings Tab
             setHeader: "Ustawienia Systemu",
             lblLangSelect: "Język / Language",
             btnHomeSet: "🏠 Powrót do menu",
@@ -761,7 +833,8 @@
 
             palletsWord: 'palet',
             boxesWord: 'pudełek',
-            noneWord: 'Brak (pełne palety)'
+            noneWord: 'Brak (pełne palety)',
+            untitledNote: 'Notatka bez tytułu'
         },
         de: {
             appTitle: "Produktionsrechner",
@@ -778,9 +851,8 @@
             btnProcessTitle: "📋 Proces Sheet",
             btnProcessDesc: "Prozessdokumentation anzeigen.",
             btnNotepadTitle: "📝 Notatnik",
-            btnNotepadDesc: "Schnelle Notizen und Memos.",
+            btnNotepadDesc: "Notizen verwalten.",
             
-            // Chocolate Tab
             chocHeader: "🍫 Schokoladenkalkulation",
             lblChocDonut: "Schokolade pro Donut (g)",
             lblDozen: "Dutzend Anzahl",
@@ -792,7 +864,6 @@
             btnResetChoc: "↺ Werte zurücksetzen",
             btnHomeChoc: "🏠 Zurück zum Start",
 
-            // Production Tab
             prodHeader: "📦 Produktions- & Palettenrechner",
             secProdParams: "⚙️ Produktionsparameter",
             lblSpeed: "Geschwindigkeit (Donuts/h)",
@@ -811,7 +882,6 @@
             btnResetProd: "↺ Werte zurücksetzen",
             btnHomeProd: "🏠 Zurück zum Start",
 
-            // Filling Tab
             fillHeader: "🍓 Füllungskalkulation",
             lblFillBoxes: "Anzahl produzierter Kartons",
             lblFillPcsBox: "Donuts pro Karton",
@@ -821,7 +891,6 @@
             btnResetFill: "↺ Werte zurücksetzen",
             btnHomeFill: "🏠 Zurück zum Start",
 
-            // Materials Tab
             matHeader: "📦 Materialkalkulation",
             lblProductSelect: "Produkt auswählen",
             optSelectDefault: "-- Produkt auswählen --",
@@ -836,18 +905,20 @@
             btnResetMat: "↺ Werte zurücksetzen",
             btnHomeMat: "🏠 Zurück zum Start",
 
-            // Process Sheet Tab
             processHeader: "📋 Proces Sheet",
             processDesc: "Prozessdokumentation und Spezifikationen.",
             btnHomeProcess: "🏠 Zurück zum Start",
 
-            // Notepad Tab
             notepadHeader: "📝 Notatnik",
-            notepadDesc: "Notizen für die Schicht erfassen.",
-            btnClearNote: "🗑️ Notizen löschen",
+            notepadDesc: "Schichtnotizen verwalten.",
+            btnNewNote: "+ Neue Notiz",
+            editorHeader: "✏️ Notiz bearbeiten",
+            lblNoteTitle: "Notiztitel",
+            lblNoteContent: "Inhalt",
+            btnDeleteNote: "🗑️ Diese Notiz löschen",
+            btnBackNotes: "← Zurück zur Liste",
             btnHomeNote: "🏠 Zurück zum Start",
 
-            // Settings Tab
             setHeader: "Systemeinstellungen",
             lblLangSelect: "Sprache / Language",
             btnHomeSet: "🏠 Zurück zum Start",
@@ -856,7 +927,8 @@
 
             palletsWord: 'Paletten',
             boxesWord: 'Kartons',
-            noneWord: 'Keine (volle Paletten)'
+            noneWord: 'Keine (volle Paletten)',
+            untitledNote: 'Unbenannte Notiz'
         },
         nl: {
             appTitle: "Productie Calculator",
@@ -873,9 +945,8 @@
             btnProcessTitle: "📋 Proces Sheet",
             btnProcessDesc: "Bekijk procesdocumentatie.",
             btnNotepadTitle: "📝 Notatnik",
-            btnNotepadDesc: "Snelle notities en memo's.",
+            btnNotepadDesc: "Beheer notities.",
             
-            // Chocolate Tab
             chocHeader: "🍫 Chocola Berekening",
             lblChocDonut: "Chocolade per donut (g)",
             lblDozen: "Aantal dozen / eenheden",
@@ -887,7 +958,6 @@
             btnResetChoc: "↺ Waarden resetten",
             btnHomeChoc: "🏠 Terug naar home",
 
-            // Production Tab
             prodHeader: "📦 Productie & Pallet Calculator",
             secProdParams: "⚙️ Productieparameters",
             lblSpeed: "Snelheid (donuts/u)",
@@ -906,7 +976,6 @@
             btnResetProd: "↺ Waarden resetten",
             btnHomeProd: "🏠 Terug naar home",
 
-            // Filling Tab
             fillHeader: "🍓 Vulling Berekening",
             lblFillBoxes: "Aantal geproduceerde dozen",
             lblFillPcsBox: "Donuts per doos",
@@ -916,7 +985,6 @@
             btnResetFill: "↺ Waarden resetten",
             btnHomeFill: "🏠 Terug naar home",
 
-            // Materials Tab
             matHeader: "📦 Materiaal Berekening",
             lblProductSelect: "Selecteer Product",
             optSelectDefault: "-- Selecteer product --",
@@ -931,18 +999,20 @@
             btnResetMat: "↺ Waarden resetten",
             btnHomeMat: "🏠 Terug naar home",
 
-            // Process Sheet Tab
             processHeader: "📋 Proces Sheet",
             processDesc: "Procesdocumentatie en specificaties.",
             btnHomeProcess: "🏠 Terug naar home",
 
-            // Notepad Tab
             notepadHeader: "📝 Notatnik",
-            notepadDesc: "Schrijf snelle notities voor je dienst.",
-            btnClearNote: "🗑️ Notities wissen",
+            notepadDesc: "Beheer je notities.",
+            btnNewNote: "+ Nieuwe Notitie",
+            editorHeader: "✏️ Notitie bewerken",
+            lblNoteTitle: "Notitietitel",
+            lblNoteContent: "Inhoud",
+            btnDeleteNote: "🗑️ Verwijder deze notitie",
+            btnBackNotes: "← Terug naar lijst",
             btnHomeNote: "🏠 Terug naar home",
 
-            // Settings Tab
             setHeader: "Systeeminstellingen",
             lblLangSelect: "Taal / Language",
             btnHomeSet: "🏠 Terug naar home",
@@ -951,7 +1021,8 @@
 
             palletsWord: 'pallets',
             boxesWord: 'dozen',
-            noneWord: 'Geen (volle pallets)'
+            noneWord: 'Geen (volle pallets)',
+            untitledNote: 'Naamloze notitie'
         }
     };
 
@@ -972,8 +1043,143 @@
         const navMap = { 'home': 'nav-home', 'settings': 'nav-sets' };
         if(navMap[tabId]) document.getElementById(navMap[tabId]).classList.add('active');
         
+        if (tabId === 'notepad') {
+            renderNotesList();
+        }
+
         document.querySelector('.content').scrollTop = 0;
     }
+
+    // Funkcje obsługi wielu notatek w localStorage
+    function loadNotesFromStorage() {
+        const saved = localStorage.getItem('ep_all_notes');
+        if (saved) {
+            try {
+                notes = JSON.parse(saved);
+            } catch (e) {
+                notes = [];
+            }
+        } else {
+            // Migracja starej pojedynczej notatki (jeśli istnieje)
+            const oldNote = localStorage.getItem('ep_notepad_content');
+            if (oldNote) {
+                notes = [{
+                    id: Date.now(),
+                    title: 'Stara notatka',
+                    content: oldNote,
+                    date: new Date().toLocaleDateString()
+                }];
+                localStorage.removeItem('ep_notepad_content');
+                saveNotesToStorage();
+            } else {
+                notes = [];
+            }
+        }
+    }
+
+    function saveNotesToStorage() {
+        localStorage.setItem('ep_all_notes', JSON.stringify(notes));
+    }
+
+    function renderNotesList() {
+        const container = document.getElementById('notes-list-container');
+        container.innerHTML = '';
+
+        if (notes.length === 0) {
+            const t = translations[currentLang] || translations['en'];
+            container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">Brak notatek. Kliknij przycisk powyżej, aby utworzyć pierwszą.</p>`;
+            return;
+        }
+
+        notes.forEach(note => {
+            const t = translations[currentLang] || translations['en'];
+            const displayTitle = note.title.trim() ? note.title : t.untitledNote;
+            
+            const item = document.createElement('div');
+            item.className = 'note-item';
+            item.innerHTML = `
+                <div class="note-info" style="flex: 1; cursor: pointer;" onclick="openNoteEditor(${note.id})">
+                    <h4>${escapeHtml(displayTitle)}</h4>
+                    <small>${note.date || ''}</small>
+                </div>
+                <div class="note-actions">
+                    <button class="btn-icon" onclick="deleteNote(${note.id}, event)" title="Usuń">🗑️</button>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function openNoteEditor(id = null) {
+        if (id === null) {
+            // Tworzenie nowej
+            const newId = Date.now();
+            const newNote = {
+                id: newId,
+                title: '',
+                content: '',
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+            notes.unshift(newNote);
+            saveNotesToStorage();
+            currentEditingId = newId;
+        } else {
+            currentEditingId = id;
+        }
+
+        const note = notes.find(n => n.id === currentEditingId);
+        if (note) {
+            document.getElementById('note-title-input').value = note.title;
+            document.getElementById('note-body-input').value = note.content;
+        }
+
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-note-editor').classList.add('active');
+        document.querySelector('.content').scrollTop = 0;
+    }
+
+    function autoSaveCurrentNote() {
+        if (currentEditingId === null) return;
+        const note = notes.find(n => n.id === currentEditingId);
+        if (note) {
+            note.title = document.getElementById('note-title-input').value;
+            note.content = document.getElementById('note-body-input').value;
+            note.date = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            saveNotesToStorage();
+        }
+    }
+
+    function closeNoteEditor() {
+        currentEditingId = null;
+        switchTab('notepad');
+    }
+
+    function deleteCurrentNote() {
+        if (currentEditingId !== null) {
+            notes = notes.filter(n => n.id !== currentEditingId);
+            saveNotesToStorage();
+            currentEditingId = null;
+            switchTab('notepad');
+        }
+    }
+
+    function deleteNote(id, event) {
+        event.stopPropagation();
+        if (confirm('Czy na pewno chcesz usunąć tę notatkę?')) {
+            notes = notes.filter(n => n.id !== id);
+            saveNotesToStorage();
+            renderNotesList();
+        }
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Inicjalizacja przy ładowaniu strony
+    window.addEventListener('DOMContentLoaded', () => {
+        loadNotesFromStorage();
+    });
 
     function calcChocolate() {
         const chocPerDonut = parseFloat(document.getElementById('c-donut').value) || 0;
@@ -1123,10 +1329,6 @@
         document.getElementById('m-palletboxes').value = "0";
     }
 
-    function clearNotes() {
-        document.getElementById('note-input').value = "";
-    }
-
     function setLang(lang, event) {
         currentLang = lang;
         document.querySelectorAll('.flag-btn').forEach(btn => btn.classList.remove('active'));
@@ -1156,7 +1358,6 @@
         document.getElementById('btn-notepad-title').innerText = t.btnNotepadTitle;
         document.getElementById('btn-notepad-desc').innerText = t.btnNotepadDesc;
 
-        // Chocolate
         document.getElementById('choc-header').innerText = t.chocHeader;
         document.getElementById('lbl-choc-donut').innerText = t.lblChocDonut;
         document.getElementById('lbl-dozen').innerText = t.lblDozen;
@@ -1168,7 +1369,6 @@
         document.getElementById('btn-reset-choc').innerText = t.btnResetChoc;
         document.getElementById('btn-home-choc').innerText = t.btnHomeChoc;
 
-        // Production
         document.getElementById('prod-header').innerText = t.prodHeader;
         document.getElementById('sec-prod-params').innerText = t.secProdParams;
         document.getElementById('lbl-speed').innerText = t.lblSpeed;
@@ -1187,8 +1387,6 @@
         document.getElementById('btn-reset-prod').innerText = t.btnResetProd;
         document.getElementById('btn-home-prod').innerText = t.btnHomeProd;
 
-        // Filling
-        document.getElementById('filling-header').innerText = t.fillHeader; // w razie gdyby zmienna ID różniła się w sekcjach
         document.getElementById('fill-header').innerText = t.fillHeader;
         document.getElementById('lbl-fill-boxes').innerText = t.lblFillBoxes;
         document.getElementById('lbl-fill-pcsbox').innerText = t.lblFillPcsBox;
@@ -1198,7 +1396,6 @@
         document.getElementById('btn-reset-fill').innerText = t.btnResetFill;
         document.getElementById('btn-home-fill').innerText = t.btnHomeFill;
 
-        // Materials
         document.getElementById('mat-header').innerText = t.matHeader;
         document.getElementById('lbl-product-select').innerText = t.lblProductSelect;
         document.getElementById('opt-select-default').innerText = t.optSelectDefault;
@@ -1213,18 +1410,20 @@
         document.getElementById('btn-reset-mat').innerText = t.btnResetMat;
         document.getElementById('btn-home-mat').innerText = t.btnHomeMat;
 
-        // Process Sheet
         document.getElementById('process-header').innerText = t.processHeader;
         document.getElementById('process-desc').innerText = t.processDesc;
         document.getElementById('btn-home-process').innerText = t.btnHomeProcess;
 
-        // Notepad
         document.getElementById('notepad-header').innerText = t.notepadHeader;
         document.getElementById('notepad-desc').innerText = t.notepadDesc;
-        document.getElementById('btn-clear-note').innerText = t.btnClearNote;
+        document.getElementById('btn-new-note').innerText = t.btnNewNote;
+        document.getElementById('editor-header').innerText = t.editorHeader;
+        document.getElementById('lbl-note-title').innerText = t.lblNoteTitle;
+        document.getElementById('lbl-note-content').innerText = t.lblNoteContent;
+        document.getElementById('btn-delete-note').innerText = t.btnDeleteNote;
+        document.getElementById('btn-back-notes').innerText = t.btnBackNotes;
         document.getElementById('btn-home-note').innerText = t.btnHomeNote;
 
-        // Settings & Nav
         document.getElementById('set-header').innerText = t.setHeader;
         document.getElementById('lbl-lang-select').innerText = t.lblLangSelect;
         document.getElementById('btn-home-set').innerText = t.btnHomeSet;
