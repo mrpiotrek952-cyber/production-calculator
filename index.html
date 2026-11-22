@@ -399,7 +399,7 @@
                 <div class="section-header" id="sec-prod-params">⚙️ Production Parameters</div>
                 <div class="form-group">
                     <label id="lbl-speed">Speed (donuts/h)</label>
-                    <input type="number" id="p-speed" value="28800" readonly>
+                    <input type="number" id="p-speed" value="28600" readonly>
                 </div>
                 <div class="form-group">
                     <label id="lbl-hours">Working hours [h]</label>
@@ -531,8 +531,7 @@
                 <h2 id="process-header">📋 Proces Sheet</h2>
                 <p id="process-desc" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">Documentation and process specifications.</p>
                 <div class="form-group">
-                    <textarea rows="6" readonly style="resize: none;" id="process-text">
-1. Check line readiness and parameters.
+                    <textarea rows="6" readonly style="resize: none;" id="process-text">1. Check line readiness and parameters.
 2. Verify raw materials and packaging specs.
 3. Maintain standard speed parameters.
 4. Record waste and shift outputs regularly.</textarea>
@@ -1283,16 +1282,18 @@
                     <tr><td>855269</td><td>Eu-Brown</td><td id="out-mat-855269">0</td></tr>
                     <tr><td>856925</td><td>Palet Label</td><td id="out-mat-856925">0</td></tr>
                     <tr><td>855222</td><td>Box Label</td><td id="out-mat-855222">0</td></tr>
+					<tr><td>Blisters</td><td>Blisters</td><td id="out-mat-Blisters">0</td></tr>
                 `;
             } else if (product === 'produkt-4u') {
                 tbody.innerHTML = `
                     <tr><td>855001</td><td>Seal PP 72x990 tarsp</td><td id="out-mat-855001">0.00</td></tr>
-                    <tr><td>855134</td><td>Plastic Sheet</td><td id="out-mat-855134">0.00</td></tr>
+                    <tr><td>855134</td><td>Plastic Sheet 4</td><td id="out-mat-855134">0.00</td></tr>
                     <tr><td>856936</td><td>Ribbon 55x600 T26</td><td id="out-mat-856936">0.00</td></tr>
                     <tr><td>855060</td><td>Film Ecostrech 17</td><td id="out-mat-855060">0.00</td></tr>
                     <tr><td>855269</td><td>Eu-Brown</td><td id="out-mat-855269">0</td></tr>
                     <tr><td>856925</td><td>Palet Label</td><td id="out-mat-856925">0</td></tr>
                     <tr><td>855222</td><td>Box Label</td><td id="out-mat-855222">0</td></tr>
+					<tr><td>Blisters</td><td>Blisters</td><td id="out-mat-Blisters">0</td></tr>
                 `;
             }
 
@@ -1318,18 +1319,20 @@
             document.getElementById('out-mat-855001').innerText = (boxes * 1.05).toFixed(2);
             document.getElementById('out-mat-855158').innerText = (totalPcs * 0.31).toFixed(2);
             document.getElementById('out-mat-856936').innerText = (totalPcs * 0.0033).toFixed(2);
-            document.getElementById('out-mat-855060').innerText = (totalPallets * 0.5).toFixed(2);
+            document.getElementById('out-mat-855060').innerText = (totalPallets * 0.18).toFixed(2);
             document.getElementById('out-mat-855269').innerText = Math.round(totalPallets).toString();
             document.getElementById('out-mat-856925').innerText = Math.ceil(totalPallets * 2).toString();
             document.getElementById('out-mat-855222').innerText = boxes;
+			document.getElementById('out-mat-Blisters').innerText = (totalPcs * boxes).toFixed(2);
         } else if (product === 'produkt-4u') {
-            document.getElementById('out-mat-855001').innerText = (boxes * 1.05).toFixed(2);
-            document.getElementById('out-mat-855134').innerText = (totalPcs * 0.31).toFixed(2);
-            document.getElementById('out-mat-856936').innerText = (totalPcs * 0.0033).toFixed(2);
-            document.getElementById('out-mat-855060').innerText = (totalPallets * 0.5).toFixed(2);
+            document.getElementById('out-mat-855001').innerText = (boxes * 1.20).toFixed(2);
+            document.getElementById('out-mat-855134').innerText = (totalPcs * 0.40).toFixed(2);
+            document.getElementById('out-mat-856936').innerText = (totalPcs * 0.0040).toFixed(2);
+            document.getElementById('out-mat-855060').innerText = (totalPallets * 0.18).toFixed(2);
             document.getElementById('out-mat-855269').innerText = Math.round(totalPallets).toString();
             document.getElementById('out-mat-856925').innerText = Math.ceil(totalPallets * 2).toString();
             document.getElementById('out-mat-855222').innerText = boxes;
+			document.getElementById('out-mat-Blisters').innerText = (totalPcs * boxes).toFixed(2);
         }
     }
 
