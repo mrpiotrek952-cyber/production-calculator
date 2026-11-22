@@ -1282,7 +1282,6 @@
                     <tr><td>855269</td><td>Eu-Brown</td><td id="out-mat-855269">0</td></tr>
                     <tr><td>856925</td><td>Palet Label</td><td id="out-mat-856925">0</td></tr>
                     <tr><td>855222</td><td>Box Label</td><td id="out-mat-855222">0</td></tr>
-					<tr><td>Blisters</td><td>Blisters</td><td id="out-mat-Blisters">0</td></tr>
                 `;
             } else if (product === 'produkt-4u') {
                 tbody.innerHTML = `
@@ -1293,7 +1292,6 @@
                     <tr><td>855269</td><td>Eu-Brown</td><td id="out-mat-855269">0</td></tr>
                     <tr><td>856925</td><td>Palet Label</td><td id="out-mat-856925">0</td></tr>
                     <tr><td>855222</td><td>Box Label</td><td id="out-mat-855222">0</td></tr>
-					<tr><td>Blisters</td><td>Blisters</td><td id="out-mat-Blisters">0</td></tr>
                 `;
             }
 
@@ -1323,7 +1321,6 @@
             document.getElementById('out-mat-855269').innerText = Math.round(totalPallets).toString();
             document.getElementById('out-mat-856925').innerText = Math.ceil(totalPallets * 2).toString();
             document.getElementById('out-mat-855222').innerText = boxes;
-			document.getElementById('out-mat-Blisters').innerText = (totalPcs * boxes).toFixed(2);
         } else if (product === 'produkt-4u') {
             document.getElementById('out-mat-855001').innerText = (boxes * 1.20).toFixed(2);
             document.getElementById('out-mat-855134').innerText = (totalPcs * 0.40).toFixed(2);
@@ -1332,7 +1329,6 @@
             document.getElementById('out-mat-855269').innerText = Math.round(totalPallets).toString();
             document.getElementById('out-mat-856925').innerText = Math.ceil(totalPallets * 2).toString();
             document.getElementById('out-mat-855222').innerText = boxes;
-			document.getElementById('out-mat-Blisters').innerText = (totalPcs * boxes).toFixed(2);
         }
     }
 
